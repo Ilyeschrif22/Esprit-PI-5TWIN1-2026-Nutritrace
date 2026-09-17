@@ -18,19 +18,16 @@ class RegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
-            'prenom' => ['required', 'string', 'max:255'],
+            'fullname' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'confirmed', Password::defaults()],
             'cin' => ['required', 'digits:8', 'unique:users,cin'],
-            'telephone' => ['required', 'string', 'regex:/^(?:\+216|216)?[2-9]\d{7}$/'],
-            'date_naissance' => ['nullable', 'date', 'before:today'],
-            'genre' => ['nullable', 'in:homme,femme'],
-            'gouvernorat' => ['required', 'string', 'max:100'],
-            'delegation' => ['nullable', 'string', 'max:100'],
-            'ville' => ['nullable', 'string', 'max:100'],
-            'adresse' => ['nullable', 'string', 'max:255'],
-            'code_postal' => ['nullable', 'digits:4'],
+            'phone' => ['required', 'string', 'regex:/^(?:\+216|216)?[2-9]\d{7}$/'],
+            'birthdate' => ['nullable', 'date', 'before:today'],
+            'governorate' => ['required', 'string', 'max:100'],
+            'city' => ['nullable', 'string', 'max:100'],
+            'address' => ['nullable', 'string', 'max:255'],
+            'terms' => ['accepted'],
         ];
     }
 
@@ -41,8 +38,8 @@ class RegisterRequest extends FormRequest
     {
         return [
             'cin.digits' => 'Le CIN doit contenir exactement 8 chiffres.',
-            'telephone.regex' => 'Le numéro doit être un téléphone tunisien valide.',
-            'code_postal.digits' => 'Le code postal tunisien doit contenir 4 chiffres.',
+            'phone.regex' => 'Le numéro doit être un téléphone tunisien valide.',
+            'terms.accepted' => 'Vous devez accepter les conditions d’utilisation.',
         ];
     }
 }

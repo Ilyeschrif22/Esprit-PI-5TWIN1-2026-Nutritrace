@@ -12,16 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('prenom')->nullable()->after('name');
+            $table->string('fullname')->after('name');
             $table->string('cin', 8)->nullable()->unique()->after('password');
-            $table->string('telephone', 20)->nullable()->after('cin');
-            $table->date('date_naissance')->nullable()->after('telephone');
-            $table->string('genre', 20)->nullable()->after('date_naissance');
-            $table->string('gouvernorat')->nullable()->after('genre');
-            $table->string('delegation')->nullable()->after('gouvernorat');
-            $table->string('ville')->nullable()->after('delegation');
-            $table->string('adresse')->nullable()->after('ville');
-            $table->string('code_postal', 10)->nullable()->after('adresse');
+            $table->string('phone', 20)->nullable()->after('cin');
+            $table->date('birthdate')->nullable()->after('phone');
+            $table->string('governorate')->nullable()->after('birthdate');
+            $table->string('city')->nullable()->after('governorate');
+            $table->string('address')->nullable()->after('city');
+        });
+
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('name');
         });
     }
 
@@ -31,17 +32,18 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
+            $table->string('name')->nullable();
+        });
+
+        Schema::table('users', function (Blueprint $table) {
             $table->dropColumn([
-                'prenom',
+                'fullname',
                 'cin',
-                'telephone',
-                'date_naissance',
-                'genre',
-                'gouvernorat',
-                'delegation',
-                'ville',
-                'adresse',
-                'code_postal',
+                'phone',
+                'birthdate',
+                'governorate',
+                'city',
+                'address',
             ]);
         });
     }

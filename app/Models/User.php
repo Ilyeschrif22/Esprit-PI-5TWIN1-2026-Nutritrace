@@ -10,19 +10,15 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 #[Fillable([
-    'name',
-    'prenom',
+    'fullname',
     'email',
     'password',
     'cin',
-    'telephone',
-    'date_naissance',
-    'genre',
-    'gouvernorat',
-    'delegation',
-    'ville',
-    'adresse',
-    'code_postal',
+    'phone',
+    'birthdate',
+    'governorate',
+    'city',
+    'address',
 ])]
 
 
@@ -43,15 +39,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'date_naissance' => 'date',
+            'birthdate' => 'date',
         ];
-    }
-
-    /**
-     * Full name for a Tunisian profile.
-     */
-    public function getNomCompletAttribute(): string
-    {
-        return trim("{$this->prenom} {$this->name}");
     }
 }
