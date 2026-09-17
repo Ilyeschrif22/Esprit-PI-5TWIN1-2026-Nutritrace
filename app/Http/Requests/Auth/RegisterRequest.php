@@ -4,6 +4,7 @@ namespace App\Http\Requests\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Password;
+use ReCaptcha\ReCaptcha;
 
 class RegisterRequest extends FormRequest
 {
@@ -31,7 +32,20 @@ class RegisterRequest extends FormRequest
             'ville' => ['nullable', 'string', 'max:100'],
             'adresse' => ['nullable', 'string', 'max:255'],
             'code_postal' => ['nullable', 'digits:4'],
+            'g-recaptcha-response' => ['required'],
         ];
+    }
+
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            $recaptcha = new ReCaptcha(env('RECAPTCHA_SECRET_KEY'));
+            $response = $recaptcha->verify($this->input('g-recaptcha-response'), $this->ip());
+
+            if (!$response->isSuccess()) {
+                $validator->errors()->add('g-recaptcha-response', 'La vérification reCAPTCHA a échoué. Veuillez réessayer.');
+            }
+        });
     }
 
     /**

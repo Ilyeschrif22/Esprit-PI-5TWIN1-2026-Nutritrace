@@ -102,6 +102,12 @@
                     <label for="password_confirmation">Confirmer le mot de passe</label>
                     <input id="password_confirmation" type="password" name="password_confirmation" required autocomplete="new-password">
                 </div>
+
+                <div class="field full">
+                    <label>Vérification de sécurité</label>
+                    <div class="g-recaptcha" data-sitekey="{{ env('RECAPTCHA_SITE_KEY') }}"></div>
+                    @error('g-recaptcha-response') <div class="error">{{ $message }}</div> @enderror
+                </div>
             </div>
 
             <div class="actions">
@@ -110,4 +116,6 @@
             </div>
         </form>
     </div>
+
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 @endsection
