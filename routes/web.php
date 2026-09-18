@@ -3,6 +3,8 @@
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PendingApprovalController;
+use App\Http\Controllers\RoleSelectionController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -18,6 +20,14 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
-    Route::get('dashboard', DashboardController::class)->name('dashboard');
+    Route::get('role-selection', [RoleSelectionController::class, 'create'])->name('role-selection.create');
+    Route::post('role-selection', [RoleSelectionController::class, 'store'])->name('role-selection.store');
+    
+    Route::get('pending-approval', PendingApprovalController::class)->name('pending-approval');
+    
+    Route::middleware('role.selected')->group(function () {
+        Route::get('dashboard', DashboardController::class)->name('dashboard');
+    });
+    
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 });

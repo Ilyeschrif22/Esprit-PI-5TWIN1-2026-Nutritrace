@@ -4,6 +4,7 @@ namespace App\Http\Requests\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\Password;
+use ReCaptcha\ReCaptcha;
 
 class RegisterRequest extends FormRequest
 {
@@ -29,6 +30,24 @@ class RegisterRequest extends FormRequest
             'address' => ['nullable', 'string', 'max:255'],
             'terms' => ['accepted'],
         ];
+    }
+
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            $secret = env('RECAPTCHA_SECRET_KEY');
+            $token = $this->input('g-recaptcha-response');
+
+            // reCAPTCHA est vérifié uniquement lorsqu'une clé secrète et un token sont fournis.
+            if ($secret && $token) {
+                $recaptcha = new ReCaptcha($secret);
+                $response = $recaptcha->verify($token, $this->ip());
+
+                if (!$response->isSuccess()) {
+                    $validator->errors()->add('g-recaptcha-response', 'La vérification reCAPTCHA a échoué. Veuillez réessayer.');
+                }
+            }
+        });
     }
 
     /**

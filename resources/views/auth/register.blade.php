@@ -106,6 +106,8 @@
                     </div>
 
                 </div>
+
+            
             </div>
 
             <div class="nutritrace-register-brand-decoration"></div>
@@ -592,3 +594,4 @@
 </body>
 
 </html>
+
