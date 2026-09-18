@@ -5,9 +5,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Créer un compte | NutriTrace</title>
+    <title>Créer un compte NutriTrace</title>
 
     <link rel="stylesheet" href="{{ asset('css/register.css') }}">
+    <link rel="icon" type="image/png" href="{{ asset('images/nutritrace-logo.png') }}">
+
+    <!-- Google reCAPTCHA -->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
  
 </head>
@@ -515,6 +519,8 @@
 
                     </div>
 
+                    
+
                     <label class="nutritrace-register-terms">
                         <input type="checkbox" name="terms" required />
 
@@ -525,6 +531,16 @@
                             <a href="#">politique de confidentialité</a>.
                         </span>
                     </label>
+
+
+                  
+                    <!-- Vérification de sécurité (reCAPTCHA) -->
+                    <div class="nutritrace-register-recaptcha">
+                        <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}"></div>
+                        @error('g-recaptcha-response')
+                            <span class="nutritrace-register-error">{{ $message }}</span>
+                        @enderror
+                    </div>
 
                     <!-- Submit button -->
                     <button type="submit" class="nutritrace-register-submit">
