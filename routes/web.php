@@ -77,7 +77,13 @@ Route::middleware('guest')->group(function () {
         Auth::login($user, $remember);
         $request->session()->regenerate();
 
-        return redirect()->intended(route('role-selection.create'));
+        // Check if user already has a role (existing user)
+        if ($user->hasAnyRole(['producteur', 'transformateur', 'distributeur', 'consommateur'])) {
+            return redirect()->intended(route('dashboard'));
+        }
+
+        // New user without role - redirect to role selection
+        return redirect()->route('role-selection.create');
     })->name('2fa.verify');
 
     Route::post('/2fa/resend', function (TwoFactorService $twoFactor) {

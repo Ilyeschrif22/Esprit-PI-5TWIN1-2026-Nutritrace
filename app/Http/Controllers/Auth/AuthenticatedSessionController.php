@@ -49,7 +49,13 @@ class AuthenticatedSessionController extends Controller
         Auth::login($user, $request->boolean('remember'));
         $request->session()->regenerate();
 
-        return redirect()->intended(route('role-selection.create'));
+        // Check if user already has a role (existing user)
+        if ($user->hasAnyRole(['producteur', 'transformateur', 'distributeur', 'consommateur'])) {
+            return redirect()->intended(route('dashboard'));
+        }
+
+        // New user without role - redirect to role selection
+        return redirect()->route('role-selection.create');
     }
 
     /**

@@ -27,6 +27,7 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
+        // New user without role - redirect to role selection
         return redirect()->route('role-selection.create');
     }
 
