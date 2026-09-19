@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PendingApprovalController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleSelectionController;
 use Illuminate\Support\Facades\Route;
 
@@ -24,6 +25,9 @@ Route::middleware('auth')->group(function () {
     Route::post('role-selection', [RoleSelectionController::class, 'store'])->name('role-selection.store');
     
     Route::get('pending-approval', PendingApprovalController::class)->name('pending-approval');
+
+    Route::get('profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('profile', [ProfileController::class, 'update'])->name('profile.update');
     
     Route::middleware('role.selected')->group(function () {
         Route::get('dashboard', DashboardController::class)->name('dashboard');

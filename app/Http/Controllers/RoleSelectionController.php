@@ -22,7 +22,6 @@ class RoleSelectionController extends Controller
     {
         $validated = $request->validate([
             'role' => 'required|in:producteur,transformateur,distributeur,consommateur',
-            'document' => 'required_if:role,producteur,transformateur,distributeur|file',
         ]);
 
         $user = Auth::user();
@@ -32,14 +31,16 @@ class RoleSelectionController extends Controller
             return redirect()->route('dashboard');
         }
 
-        $documentPath = $request->file('document')->store('role-documents', 'public');
+        if ($request->hasFile('document') && $request->file('document')->isValid()) {
+            $documentPath = $request->file('document')->store('role-documents', 'public');
 
-        RoleDocument::create([
-            'user_id' => $user->id,
-            'role' => $validated['role'],
-            'document_path' => $documentPath,
-            'status' => 'pending',
-        ]);
+            RoleDocument::create([
+                'user_id' => $user->id,
+                'role' => $validated['role'],
+                'document_path' => $documentPath,
+                'status' => 'pending',
+            ]);
+        }
 
         // Assign role immediately - no manual approval needed for now
         $user->assignRole($validated['role']);

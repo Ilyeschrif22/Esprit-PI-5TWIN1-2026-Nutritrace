@@ -49,7 +49,7 @@
                         @enderror
                     </div>
 
-                    <!-- Document justificatif (requis pour les rôles professionnels) -->
+                    <!-- Document justificatif (facultatif) -->
                     <div id="document-upload" class="nutritrace-role-document" style="display: none;">
                         <label for="document" id="document-label">Document justificatif</label>
 
@@ -97,12 +97,14 @@
                 };
 
                 documentLabel.textContent = roleLabels[role];
-                fileInput.required = true;
+                fileInput.required = false;
             } else {
                 documentUpload.style.display = 'none';
                 fileInput.required = false;
             }
         }
+
+        document.addEventListener('DOMContentLoaded', toggleDocumentUpload);
     </script>
 
     <style>

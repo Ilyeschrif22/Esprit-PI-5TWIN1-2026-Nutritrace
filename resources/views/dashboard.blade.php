@@ -1,150 +1,60 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tableau de bord | NutriTrace</title>
-</head>
-
-<body>
-
-    <main class="nutritrace-register-page">
-
-        @include('auth.partials.nutritrace-brand')
-
-        <!-- Partie droite -->
-        <section class="nutritrace-register-form-section">
-
-            <div class="nutritrace-register-form-container">
-
-                @php $user = auth()->user(); @endphp
-
-                <div class="nutritrace-register-form-header">
-                    <h2>Bonjour, {{ $user->fullname }}</h2>
-
-                    <p class="nutritrace-register-form-header-description">
-                        {{ $user->governorate }}
-                        @if ($user->cin)
-                            · CIN {{ $user->cin }}
-                        @endif
-                    </p>
-                </div>
-
-                <div class="nutritrace-dashboard-card">
-
-                    <div class="nutritrace-dashboard-row">
-                        <span class="nutritrace-dashboard-label">Email</span>
-                        <span class="nutritrace-dashboard-value">{{ $user->email }}</span>
-                    </div>
-
-                    @if ($user->phone)
-                        <div class="nutritrace-dashboard-row">
-                            <span class="nutritrace-dashboard-label">Téléphone</span>
-                            <span class="nutritrace-dashboard-value">{{ $user->phone }}</span>
-                        </div>
-                    @endif
-
-                    @if ($user->birthdate)
-                        <div class="nutritrace-dashboard-row">
-                            <span class="nutritrace-dashboard-label">Date de naissance</span>
-                            <span class="nutritrace-dashboard-value">{{ $user->birthdate->format('d/m/Y') }}</span>
-                        </div>
-                    @endif
-
-                    @if ($user->city)
-                        <div class="nutritrace-dashboard-row">
-                            <span class="nutritrace-dashboard-label">Ville</span>
-                            <span class="nutritrace-dashboard-value">{{ $user->city }}</span>
-                        </div>
-                    @endif
-
-                    @if ($user->address)
-                        <div class="nutritrace-dashboard-row">
-                            <span class="nutritrace-dashboard-label">Adresse</span>
-                            <span class="nutritrace-dashboard-value">{{ $user->address }}</span>
-                        </div>
-                    @endif
-
-                </div>
-
-                @if ($user->hasAnyRole(['producteur', 'transformateur', 'distributeur', 'consommateur']))
-                    <div class="nutritrace-dashboard-role">
-                        Rôle actuel :
-                        <strong>{{ $user->getRoleNames()->first() }}</strong>
-                    </div>
-                @endif
-
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-
-                    <button type="submit" class="nutritrace-register-submit">
-                        Déconnexion
-                    </button>
-                </form>
-
-            </div>
-        </section>
-
-    </main>
-
     <style>
-        .nutritrace-register-submit {
-            width: 100%;
-            margin: 22px 0 0;
-        }
-
-        .nutritrace-dashboard-card {
-            display: grid;
-            gap: 2px;
-
-            margin-top: 22px;
-            padding: 6px 22px;
-
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-
-            background: #ffffff;
-        }
-
-        .nutritrace-dashboard-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 20px;
-
-            padding: 11px 0;
-
-            border-bottom: 1px solid var(--border-color);
-
-            font-size: 14px;
-        }
-
-        .nutritrace-dashboard-row:last-child {
-            border-bottom: none;
-        }
-
-        .nutritrace-dashboard-label {
-            color: var(--muted-text);
-        }
-
-        .nutritrace-dashboard-value {
-            color: var(--text-color);
-            font-weight: 600;
-        }
-
-        .nutritrace-dashboard-role {
-            margin-top: 14px;
-
-            color: var(--muted-text);
-            font-size: 13px;
-        }
-
-        .nutritrace-dashboard-role strong {
-            color: var(--green);
-        }
+        :root { --ink:#073d3d; --muted:#607c85; --green:#4eaa58; --soft:#e4f5e4; --line:#dce9ec; --canvas:#f4f9f9; --shadow:0 8px 26px rgba(16,73,73,.06); }
+        * { box-sizing:border-box; } body { margin:0; background:var(--canvas); color:var(--ink); font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; } button,input { font:inherit; } button { cursor:pointer; }
+        .shell { display:flex; min-height:100vh; } .sidebar { width:246px; flex:0 0 246px; display:flex; flex-direction:column; padding:24px 14px 18px; background:linear-gradient(180deg,#064642,#033c3b); color:#fff; }
+        .brand { display:flex; align-items:center; gap:10px; padding:0 12px 28px; } .brand img { width:34px; height:42px; object-fit:contain; } .brand-name { font-size:18px; font-weight:800; letter-spacing:-.6px; } .brand-tag { display:block; margin-top:2px; color:#74d67a; font-size:8px; font-weight:800; letter-spacing:.8px; }
+        .nav { display:grid; gap:4px; } .nav a { display:flex; align-items:center; gap:12px; min-height:40px; padding:0 12px; border-radius:7px; color:#d4eeee; text-decoration:none; font-size:13px; font-weight:600; } .nav a:hover,.nav a.active { background:#55ad59; color:#fff; } .nav-icon { width:18px; text-align:center; font-size:16px; } .spacer { flex:1; }
+        .sustain { padding:18px 14px 14px; border:1px solid rgba(164,235,183,.22); border-radius:8px; background:rgba(52,142,103,.18); color:#d7eeee; font-size:11px; line-height:1.55; } .sustain strong { display:block; margin-bottom:3px; color:#fff; font-size:13px; } .leaf { display:block; margin-bottom:8px; color:#8edc4a; font-size:30px; line-height:1; }
+        .main { min-width:0; flex:1; } .topbar { display:flex; align-items:center; gap:18px; min-height:64px; padding:0 30px; border-bottom:1px solid var(--line); background:rgba(255,255,255,.9); } .search { position:relative; width:min(510px,100%); } .search input { width:100%; height:36px; padding:0 14px 0 38px; border:1px solid var(--line); border-radius:6px; color:var(--ink); outline:0; font-size:12px; } .search span { position:absolute; top:8px; left:14px; color:#5d8590; font-size:10px; } .top-actions { display:flex; align-items:center; gap:20px; margin-left:auto; } .bell { position:relative; font-size:11px; color:var(--ink); } .badge { position:absolute; top:-8px; right:-8px; display:grid; place-items:center; width:16px; height:16px; border-radius:50%; background:var(--green); color:#fff; font-size:9px; } .user { display:flex; align-items:center; gap:9px; color:var(--ink); font-size:11px; text-decoration:none; } .avatar { display:grid; place-items:center; width:30px; height:30px; border-radius:50%; background:#e2eff0; font-size:9px; } .user strong { display:block; font-size:11px; } .user small { color:var(--muted); }
+        .content { max-width:1420px; margin:0 auto; padding:28px 30px 36px; } .intro { display:flex; align-items:end; justify-content:space-between; gap:20px; margin-bottom:22px; } h1 { margin:0 0 4px; font-size:clamp(23px,2.4vw,31px); letter-spacing:-.9px; } .intro p { margin:0; color:var(--muted); font-size:12px; } .date { color:var(--green); font-size:12px; font-weight:700; text-align:right; } .date small { color:var(--muted); font-weight:400; }
+        .kpis { display:grid; grid-template-columns:repeat(6,minmax(130px,1fr)); gap:12px; margin-bottom:14px; } .panel,.kpi { border:1px solid var(--line); border-radius:7px; background:#fff; box-shadow:var(--shadow); } .kpi { padding:14px 13px 12px; } .kpi-head { display:flex; align-items:center; justify-content:space-between; color:var(--muted); font-size:11px; } .kpi-icon { display:grid; place-items:center; width:31px; height:31px; border-radius:9px; background:var(--soft); color:#23853c; font-size:17px; } .kpi strong { display:block; margin-top:8px; font-size:22px; } .trend { margin-top:7px; color:#42a34b; font-size:10px; font-weight:700; } .trend span { color:var(--muted); font-weight:400; }
+        .grid { display:grid; grid-template-columns:1.05fr 1.05fr 1.65fr; gap:14px; margin-bottom:14px; } .panel { min-width:0; padding:16px; } .panel-title { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; font-size:13px; font-weight:800; } .panel-title a { color:var(--green); font-size:10px; font-weight:700; text-decoration:none; } .select { border:1px solid var(--line); border-radius:16px; padding:6px 10px; color:var(--muted); background:#fff; font-size:10px; }
+        .donut-wrap { display:flex; align-items:center; gap:22px; min-height:138px; } .donut { position:relative; width:124px; height:124px; flex:0 0 124px; border-radius:50%; background:conic-gradient(#46a85b 0 28%,#79bd5e 28% 52%,#18a89f 52% 67%,#35a7c1 67% 79%,#a6c75d 79% 87%,#c5dbcf 87%); } .donut:after { content:""; position:absolute; inset:28px; border-radius:50%; background:#fff; } .donut-label { position:absolute; z-index:1; inset:0; display:grid; place-content:center; text-align:center; font-size:21px; font-weight:800; } .donut-label small { display:block; color:var(--muted); font-size:9px; font-weight:500; } .legend { display:grid; gap:8px; min-width:112px; color:var(--muted); font-size:10px; } .legend div { display:flex; justify-content:space-between; gap:12px; } .legend i { display:inline-block; width:8px; height:8px; margin-right:5px; border-radius:50%; background:#46a85b; } .legend b { color:var(--ink); }
+        .line-chart { position:relative; height:150px; overflow:hidden; padding:5px 0 20px 22px; background:repeating-linear-gradient(to bottom,transparent 0 34px,#edf3f3 35px 36px); } .line-chart:before { content:"800\A 600\A 400\A 200"; white-space:pre; position:absolute; left:0; top:2px; color:var(--muted); font-size:8px; line-height:35px; } .line-chart svg { width:100%; height:100%; overflow:visible; } .chart-labels { display:flex; justify-content:space-around; margin:4px 0 0 22px; color:var(--muted); font-size:9px; }
+        .trace-map { display:grid; grid-template-columns:1fr 112px; min-height:170px; overflow:hidden; border-radius:6px; background:#d9e7d0; } .map-art { position:relative; overflow:hidden; background:linear-gradient(145deg,#9dbb85,#d5d89a 38%,#8cac7e 39% 54%,#d7c990 55% 70%,#79a675 71%); } .map-art:before { content:""; position:absolute; inset:-20px; opacity:.35; background:repeating-linear-gradient(65deg,transparent 0 32px,#fff 33px 35px,transparent 36px 58px),repeating-linear-gradient(-25deg,transparent 0 45px,#427c63 46px 48px,transparent 49px 86px); transform:rotate(-10deg); } .route { position:absolute; left:15%; right:15%; top:47%; height:2px; background:#fff; transform:rotate(-22deg); box-shadow:0 0 0 1px #3e9860; } .pin { position:absolute; z-index:1; display:grid; place-items:center; width:26px; height:26px; border:2px solid #fff; border-radius:50%; background:#3c9d65; color:#fff; font-size:11px; box-shadow:0 2px 5px #42684e; } .pin.one { left:15%; top:29%; } .pin.two { left:48%; top:43%; background:#1b8d99; } .pin.three { right:15%; bottom:17%; background:#f6a11b; } .map-chip { position:absolute; z-index:2; padding:5px 7px; border-radius:4px; background:rgba(3,70,67,.88); color:#fff; font-size:8px; } .map-chip.one { left:10%; top:12%; } .map-chip.two { left:41%; top:24%; } .map-chip.three { right:5%; bottom:5%; } .trace-facts { display:grid; gap:14px; padding:14px 12px; background:#fff; color:var(--muted); font-size:9px; } .trace-facts strong { display:block; margin-top:4px; color:var(--ink); font-size:12px; }
+        .lower { grid-template-columns:1.05fr 1.05fr 1.25fr 1.15fr; } .bars { display:flex; align-items:end; justify-content:space-around; height:137px; padding:10px 10px 0; border-bottom:1px solid var(--line); } .bar { display:flex; flex-direction:column; align-items:center; justify-content:end; gap:5px; height:100%; color:var(--muted); font-size:9px; } .bar i { display:block; width:28px; min-height:5px; border-radius:4px 4px 0 0; background:#55ac5d; } .bar:nth-child(2) i { background:#19a28f; } .bar:nth-child(3) i { background:#0d5960; } .bar:nth-child(4) i { background:#6b9eaa; } .impact-list,.activity-list { display:grid; gap:12px; } .impact-item,.activity-item { display:flex; align-items:center; gap:9px; font-size:10px; } .impact-icon { display:grid; place-items:center; width:28px; height:28px; border-radius:50%; background:var(--soft); color:#27904b; font-size:15px; } .impact-item span,.activity-item span { display:block; color:var(--muted); } .impact-item strong { display:block; margin-top:2px; font-size:12px; } .activity-item { align-items:flex-start; padding-bottom:8px; border-bottom:1px solid #edf3f3; } .activity-item:last-child { border-bottom:0; } .activity-time { margin-left:auto; color:var(--muted); white-space:nowrap; font-size:9px; }
+        @media (max-width:1100px) { .sidebar { width:205px; flex-basis:205px; } .kpis { grid-template-columns:repeat(3,1fr); } .grid,.lower { grid-template-columns:repeat(2,1fr); } .trace-panel { grid-column:span 2; } } @media (max-width:720px) { .shell { display:block; } .sidebar { width:100%; padding:12px; } .brand { padding-bottom:12px; } .nav { grid-template-columns:repeat(3,1fr); } .nav a { justify-content:center; padding:7px 4px; font-size:10px; } .nav a span:last-child { display:none; } .spacer,.sustain { display:none; } .topbar { padding:12px 16px; } .user { display:none; } .content { padding:20px 16px; } .intro { align-items:flex-start; flex-direction:column; } .date { text-align:left; } .kpis,.grid,.lower { grid-template-columns:1fr; } .trace-panel { grid-column:auto; } }
     </style>
-
+</head>
+<body>
+    @php($user = auth()->user())
+    <div class="shell">
+        <aside class="sidebar">
+            <div class="brand"><img src="{{ asset('images/nutritrace-logo.png') }}" alt="NutriTrace"><div><span class="brand-name">NutriTrace</span><span class="brand-tag">TRAÃ‡ABILITÃ‰ ALIMENTAIRE</span></div></div>
+            <nav class="nav" aria-label="Navigation principale">
+                <a class="active" href="{{ route('dashboard') }}"><span class="nav-icon">âŒ‚</span><span>Tableau de bord</span></a><a href="#produits"><span class="nav-icon">â—ˆ</span><span>Produits</span></a><a href="#lots"><span class="nav-icon">â–±</span><span>Lots</span></a><a href="#acteurs"><span class="nav-icon">â™™</span><span>Acteurs</span></a><a href="#tracabilite"><span class="nav-icon">â—Ž</span><span>TraÃ§abilitÃ©</span></a><a href="#transports"><span class="nav-icon">â–°</span><span>Transports</span></a><a href="#certifications"><span class="nav-icon">â™¢</span><span>Certifications</span></a><a href="#documents"><span class="nav-icon">â–¤</span><span>Documents</span></a><a href="#impact"><span class="nav-icon">â—’</span><span>Impact environnemental</span></a><a href="#cartographie"><span class="nav-icon">âŒ–</span><span>Cartographie</span></a><a href="#statistiques"><span class="nav-icon">â–¥</span><span>Statistiques</span></a><a href="#utilisateurs"><span class="nav-icon">â™§</span><span>Utilisateurs</span></a>
+            </nav>
+            <div class="spacer"></div><div class="sustain"><span class="leaf">â—’</span><strong>Une alimentation plus sÃ»re et plus durable</strong>avec NutriTrace</div>
+        </aside>
+        <main class="main">
+            <header class="topbar"><label class="search"><span>Search</span><input type="search" placeholder="Rechercher un produit, un lot, un acteur..."></label><div class="top-actions"><span class="bell">Notifications <b class="badge">3</b></span><a class="user" href="{{ route('profile.edit') }}" aria-label="Modifier mon profil"><span class="avatar">User</span><div><strong>{{ $user->fullname }}</strong><small>{{ ucfirst($user->getRoleNames()->first() ?? 'Utilisateur') }}</small></div><span>View</span></a></div></header>
+            <div class="content">
+                <div class="intro"><div><h1>Bonjour, {{ $user->fullname }} ðŸ‘‹</h1><p>Voici un aperÃ§u de votre activitÃ© sur la plateforme NutriTrace.</p></div><div class="date">â–£ &nbsp;16 septembre 2026<br><small>DerniÃ¨re mise Ã  jour : 10:24</small></div></div>
+                <section class="kpis">
+                    @foreach ([['Produits','â—ˆ','1 245','+12%'],['Lots','â–±','582','+8%'],['Acteurs','â™™','124','+15%'],['Certifications','â™¢','87','+10%'],['Transports','â–°','1 832','+18%'],['Ã‰missions COâ‚‚','â—’','4,2 t','-6%']] as $kpi)
+                        <article class="kpi"><div class="kpi-head"><span>{{ $kpi[0] }}</span><span class="kpi-icon">{{ $kpi[1] }}</span></div><strong>{{ $kpi[2] }}</strong><div class="trend">â†— {{ $kpi[3] }} <span>vs mois dernier</span></div></article>
+                    @endforeach
+                </section>
+                <section class="grid">
+                    <article class="panel" id="produits"><div class="panel-title">Produits par catÃ©gorie</div><div class="donut-wrap"><div class="donut"><div class="donut-label">1 245<small>produits</small></div></div><div class="legend"><div><span><i></i>Fruits</span><b>28%</b></div><div><span><i style="background:#79bd5e"></i>LÃ©gumes</span><b>24%</b></div><div><span><i style="background:#18a89f"></i>CÃ©rÃ©ales</span><b>15%</b></div><div><span><i style="background:#35a7c1"></i>Produits laitiers</span><b>12%</b></div><div><span><i style="background:#a6c75d"></i>Viandes</span><b>8%</b></div></div></div></article>
+                    <article class="panel" id="lots"><div class="panel-title">Ã‰volution des lots <span class="select">6 derniers moisâŒ„</span></div><div class="line-chart"><svg viewBox="0 0 400 120" preserveAspectRatio="none"><path d="M0 103 C50 94,73 96,106 89 S160 88,195 80 S245 82,282 62 S332 58,400 21" fill="none" stroke="#48a85a" stroke-width="3"/><path d="M0 103 C50 94,73 96,106 89 S160 88,195 80 S245 82,282 62 S332 58,400 21 V120 H0Z" fill="#dff3df" opacity=".75"/></svg></div><div class="chart-labels"><span>Avr</span><span>Mai</span><span>Juin</span><span>Juil</span><span>AoÃ»t</span><span>Sep</span></div></article>
+                    <article class="panel trace-panel" id="tracabilite"><div class="panel-title">TraÃ§abilitÃ© du lot #LOT-2026-001 <a href="#cartographie">Voir la carte complÃ¨te â†’</a></div><div class="trace-map"><div class="map-art"><span class="route"></span><span class="pin one">â—‰</span><span class="pin two">â–£</span><span class="pin three">â–°</span><span class="map-chip one">Producteur<br><b>Nabeul</b></span><span class="map-chip two">Transformateur<br><b>Tunis</b></span><span class="map-chip three">Distributeur<br><b>Sfax</b></span></div><div class="trace-facts"><div>Distance totale<strong>85 km</strong></div><div>COâ‚‚ estimÃ©e<strong>24.8 kg</strong></div><div>DurÃ©e totale<strong>2 h 45</strong></div></div></div></article>
+                </section>
+                <section class="grid lower">
+                    <article class="panel" id="acteurs"><div class="panel-title">Acteurs par type</div><div class="bars"><div class="bar"><i style="height:82%"></i>Producteurs</div><div class="bar"><i style="height:55%"></i>Transformateurs</div><div class="bar"><i style="height:40%"></i>Distributeurs</div><div class="bar"><i style="height:20%"></i>Autres</div></div></article>
+                    <article class="panel"><div class="panel-title">Statut des lots</div><div class="donut-wrap"><div class="donut" style="background:conic-gradient(#46a85b 0 52%,#18a89f 52% 70%,#7cc6b8 70% 92%,#c5dbcf 92%)"><div class="donut-label">582<small>lots</small></div></div><div class="legend"><div><span><i></i>En cours</span><b>52%</b></div><div><span><i style="background:#18a89f"></i>ExpirÃ©</span><b>18%</b></div><div><span><i style="background:#7cc6b8"></i>Complet</span><b>22%</b></div><div><span><i style="background:#c5dbcf"></i>En attente</span><b>8%</b></div></div></div></article>
+                    <article class="panel" id="impact"><div class="panel-title">Impact environnemental</div><div class="impact-list"><div class="impact-item"><b class="impact-icon">â˜</b><div><span>COâ‚‚ total</span><strong>4,2 t <em class="trend">â†“ -6%</em></strong></div></div><div class="impact-item"><b class="impact-icon">â—‰</b><div><span>Eau consommÃ©e</span><strong>12 480 L <em class="trend">â†“ -8%</em></strong></div></div><div class="impact-item"><b class="impact-icon">ÏŸ</b><div><span>Ã‰nergie consommÃ©e</span><strong>8 760 kWh <em class="trend">â†“ -5%</em></strong></div></div><div class="impact-item"><b class="impact-icon">âŒ–</b><div><span>Distance totale</span><strong>12 430 km <em class="trend">â†“ -12%</em></strong></div></div></div></article>
+                    <article class="panel"><div class="panel-title">ActivitÃ© rÃ©cente <a href="#">Voir tout â†’</a></div><div class="activity-list"><div class="activity-item"><b class="impact-icon">âœ“</b><div><span>Un nouveau lot a Ã©tÃ© ajoutÃ©</span>LOT-2026-001</div><small class="activity-time">10:24</small></div><div class="activity-item"><b class="impact-icon">â™¢</b><div><span>Certification BIO vÃ©rifiÃ©e</span>LOT-2026-001</div><small class="activity-time">09:47</small></div><div class="activity-item"><b class="impact-icon">â–°</b><div><span>Transport enregistrÃ©</span>Nabeul â†’ Tunis</div><small class="activity-time">08:32</small></div><div class="activity-item"><b class="impact-icon">â™™</b><div><span>Un utilisateur a mis Ã  jour un produit</span>Huile d'olive</div><small class="activity-time">07:15</small></div></div></article>
+                </section>
+                <form method="POST" action="{{ route('logout') }}" style="margin-top:16px;text-align:right;">@csrf<button type="submit" style="border:0;background:transparent;color:var(--muted);font-size:11px;text-decoration:underline;">Se dÃ©connecter</button></form>
+            </div>
+        </main>
+    </div>
 </body>
-
 </html>
