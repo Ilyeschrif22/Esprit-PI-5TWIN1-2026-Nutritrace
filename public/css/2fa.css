@@ -1,0 +1,85 @@
+/* Extends login.css — relies on its :root variables (--green, --text-color, --border-color, etc.) */
+
+.nutritrace-2fa-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: 24px;
+  border-radius: 14px;
+  background: var(--light-green);
+  color: var(--green);
+}
+
+.nutritrace-2fa-icon svg {
+  width: 28px;
+  height: 28px;
+}
+
+.nutritrace-2fa-field {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.nutritrace-2fa-field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.nutritrace-2fa-otp-group {
+  display: flex;
+  gap: 10px;
+}
+
+.nutritrace-2fa-otp-input {
+  width: 100%;
+  height: 56px;
+  border: 1px solid var(--border-color);
+  outline: none;
+  background: var(--input-background);
+  color: var(--text-color);
+  font-family: inherit;
+  font-size: 22px;
+  font-weight: 600;
+  text-align: center;
+  transition: 0.2s ease;
+}
+
+.nutritrace-2fa-otp-input:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(61, 155, 69, 0.1);
+}
+
+.nutritrace-2fa-resend {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: -4px;
+  font-size: 13px;
+}
+
+.nutritrace-2fa-timer {
+  color: var(--muted-text);
+}
+
+.nutritrace-2fa-resend-btn {
+  border: none;
+  background: transparent;
+  color: var(--green);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.nutritrace-2fa-resend-btn:disabled {
+  color: var(--muted-text);
+  cursor: not-allowed;
+}
+
+.nutritrace-2fa-resend-btn:not(:disabled):hover {
+  text-decoration: underline;
+}

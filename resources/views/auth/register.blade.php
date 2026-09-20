@@ -5,11 +5,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Créer un compte | NutriTrace</title>
+    <title>Créer un compte NutriTrace</title>
 
     <link rel="stylesheet" href="{{ asset('css/register.css') }}">
+    <link rel="icon" type="image/png" href="{{ asset('images/nutritrace-logo.png') }}">
 
- 
+    <!-- Google reCAPTCHA -->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+
 </head>
 
 <body>
@@ -107,7 +111,7 @@
 
                 </div>
 
-            
+
             </div>
 
             <div class="nutritrace-register-brand-decoration"></div>
@@ -139,24 +143,15 @@
                             <label for="fullname">Nom complet</label>
 
                             <div class="nutritrace-register-input-wrapper">
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                    width="20" height="20" viewBox="0 0 24 24"
-                                    fill="none" stroke="#0b4145" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round"
-                                    class="nutritrace-register-input-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                    fill="none" stroke="#0b4145" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="nutritrace-register-input-icon">
                                     <circle cx="12" cy="8" r="5"></circle>
                                     <path d="M20 21a8 8 0 0 0-16 0"></path>
                                 </svg>
 
-                                <input
-                                    type="text"
-                                    id="fullname"
-                                    name="fullname"
-                                    value="{{ old('fullname') }}"
-                                    placeholder="Entrez votre nom complet"
-                                    required
-                                    autofocus
-                                />
+                                <input type="text" id="fullname" name="fullname" value="{{ old('fullname') }}"
+                                    placeholder="Entrez votre nom complet" required autofocus />
                             </div>
                             @error('fullname') <span class="nutritrace-register-error">{{ $message }}</span> @enderror
                         </div>
@@ -166,27 +161,17 @@
                             <label for="cin">CIN</label>
 
                             <div class="nutritrace-register-input-wrapper">
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                    width="20" height="20" viewBox="0 0 24 24"
-                                    fill="none" stroke="#0b4145" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round"
-                                    class="nutritrace-register-input-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                    fill="none" stroke="#0b4145" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="nutritrace-register-input-icon">
                                     <rect x="3" y="5" width="18" height="14" rx="2"></rect>
                                     <circle cx="8" cy="12" r="2"></circle>
                                     <path d="M13 10h4"></path>
                                     <path d="M13 14h4"></path>
                                 </svg>
 
-                                <input
-                                    type="text"
-                                    id="cin"
-                                    name="cin"
-                                    value="{{ old('cin') }}"
-                                    placeholder="Entrez votre CIN"
-                                    maxlength="8"
-                                    inputmode="numeric"
-                                    required
-                                />
+                                <input type="text" id="cin" name="cin" value="{{ old('cin') }}"
+                                    placeholder="Entrez votre CIN" maxlength="8" inputmode="numeric" required />
                             </div>
                             @error('cin') <span class="nutritrace-register-error">{{ $message }}</span> @enderror
                         </div>
@@ -202,24 +187,15 @@
                             <label for="email">Adresse e-mail</label>
 
                             <div class="nutritrace-register-input-wrapper">
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                    width="20" height="20" viewBox="0 0 24 24"
-                                    fill="none" stroke="#0b4145" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round"
-                                    class="nutritrace-register-input-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                    fill="none" stroke="#0b4145" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="nutritrace-register-input-icon">
                                     <rect x="2" y="4" width="20" height="16" rx="2"></rect>
                                     <path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"></path>
                                 </svg>
 
-                                <input
-                                    type="email"
-                                    id="email"
-                                    name="email"
-                                    value="{{ old('email') }}"
-                                    placeholder="exemple@email.com"
-                                    required
-                                    autocomplete="username"
-                                />
+                                <input type="email" id="email" name="email" value="{{ old('email') }}"
+                                    placeholder="exemple@email.com" required autocomplete="username" />
                             </div>
                             @error('email') <span class="nutritrace-register-error">{{ $message }}</span> @enderror
                         </div>
@@ -229,11 +205,9 @@
                             <label for="phone">Téléphone</label>
 
                             <div class="nutritrace-register-input-wrapper">
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                    width="20" height="20" viewBox="0 0 24 24"
-                                    fill="none" stroke="#0b4145" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round"
-                                    class="nutritrace-register-input-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                    fill="none" stroke="#0b4145" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="nutritrace-register-input-icon">
                                     <path d="M22 16.92v3a2 2 0 0 1-2.18 2
                                         19.79 19.79 0 0 1-8.63-3.07
                                         19.5 19.5 0 0 1-6-6
@@ -249,14 +223,8 @@
                                     </path>
                                 </svg>
 
-                                <input
-                                    type="tel"
-                                    id="phone"
-                                    name="phone"
-                                    value="{{ old('phone') }}"
-                                    placeholder="Ex : 20 123 456"
-                                    required
-                                />
+                                <input type="tel" id="phone" name="phone" value="{{ old('phone') }}"
+                                    placeholder="Ex : 20 123 456" required />
                             </div>
                             @error('phone') <span class="nutritrace-register-error">{{ $message }}</span> @enderror
                         </div>
@@ -272,24 +240,17 @@
                             <label for="birthdate">Date de naissance</label>
 
                             <div class="nutritrace-register-input-wrapper">
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                    width="20" height="20" viewBox="0 0 24 24"
-                                    fill="none" stroke="#0b4145" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round"
-                                    class="nutritrace-register-input-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                    fill="none" stroke="#0b4145" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="nutritrace-register-input-icon">
                                     <rect x="3" y="4" width="18" height="18" rx="2"></rect>
                                     <line x1="16" x2="16" y1="2" y2="6"></line>
                                     <line x1="8" x2="8" y1="2" y2="6"></line>
                                     <line x1="3" x2="21" y1="10" y2="10"></line>
                                 </svg>
 
-                                <input
-                                    type="date"
-                                    id="birthdate"
-                                    name="birthdate"
-                                    value="{{ old('birthdate') }}"
-                                    required
-                                />
+                                <input type="date" id="birthdate" name="birthdate" value="{{ old('birthdate') }}"
+                                    required />
                             </div>
                             @error('birthdate') <span class="nutritrace-register-error">{{ $message }}</span> @enderror
                         </div>
@@ -299,11 +260,9 @@
                             <label for="governorate">Gouvernorat</label>
 
                             <div class="nutritrace-register-input-wrapper">
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                    width="20" height="20" viewBox="0 0 24 24"
-                                    fill="none" stroke="#0b4145" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round"
-                                    class="nutritrace-register-input-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                    fill="none" stroke="#0b4145" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="nutritrace-register-input-icon">
                                     <path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"></path>
                                     <circle cx="12" cy="10" r="3"></circle>
                                 </svg>
@@ -313,16 +272,37 @@
                                         Sélectionnez votre gouvernorat
                                     </option>
                                     @foreach ([
-                                        'Tunis', 'Ariana', 'Ben Arous', 'Manouba', 'Nabeul', 'Zaghouan', 'Bizerte',
-                                        'Béja', 'Jendouba', 'Le Kef', 'Siliana', 'Kairouan', 'Kasserine', 'Sidi Bouzid',
-                                        'Sousse', 'Monastir', 'Mahdia', 'Sfax', 'Gabès', 'Médenine', 'Tataouine',
-                                        'Gafsa', 'Tozeur', 'Kébili',
-                                    ] as $gov)
+                                            'Tunis',
+                                            'Ariana',
+                                            'Ben Arous',
+                                            'Manouba',
+                                            'Nabeul',
+                                            'Zaghouan',
+                                            'Bizerte',
+                                            'Béja',
+                                            'Jendouba',
+                                            'Le Kef',
+                                            'Siliana',
+                                            'Kairouan',
+                                            'Kasserine',
+                                            'Sidi Bouzid',
+                                            'Sousse',
+                                            'Monastir',
+                                            'Mahdia',
+                                            'Sfax',
+                                            'Gabès',
+                                            'Médenine',
+                                            'Tataouine',
+                                            'Gafsa',
+                                            'Tozeur',
+                                            'Kébili',
+                                        ] as $gov)
                                         <option value="{{ $gov }}" @selected(old('governorate') === $gov)>{{ $gov }}</option>
                                     @endforeach
                                 </select>
                             </div>
-                            @error('governorate') <span class="nutritrace-register-error">{{ $message }}</span> @enderror
+                            @error('governorate') <span class="nutritrace-register-error">{{ $message }}</span>
+                            @enderror
                         </div>
 
                     </div>
@@ -336,16 +316,9 @@
 
                             <div class="nutritrace-register-input-wrapper">
 
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                    width="20"
-                                    height="20"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="#0b4145"
-                                    stroke-width="2"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    class="nutritrace-register-input-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                    fill="none" stroke="#0b4145" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="nutritrace-register-input-icon">
                                     <path d="M3 21h18"></path>
                                     <path d="M5 21V7l7-4 7 4v14"></path>
                                     <path d="M9 21v-6h6v6"></path>
@@ -354,14 +327,8 @@
                                     <path d="M15 9h.01"></path>
                                 </svg>
 
-                                <input
-                                    type="text"
-                                    id="city"
-                                    name="city"
-                                    value="{{ old('city') }}"
-                                    placeholder="Entrez votre ville"
-                                    required
-                                />
+                                <input type="text" id="city" name="city" value="{{ old('city') }}"
+                                    placeholder="Entrez votre ville" required />
 
                             </div>
                             @error('city') <span class="nutritrace-register-error">{{ $message }}</span> @enderror
@@ -374,28 +341,15 @@
 
                             <div class="nutritrace-register-input-wrapper">
 
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                    width="20"
-                                    height="20"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="#0b4145"
-                                    stroke-width="2"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    class="nutritrace-register-input-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                    fill="none" stroke="#0b4145" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="nutritrace-register-input-icon">
                                     <path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"></path>
                                     <circle cx="12" cy="10" r="3"></circle>
                                 </svg>
 
-                                <input
-                                    type="text"
-                                    id="address"
-                                    name="address"
-                                    value="{{ old('address') }}"
-                                    placeholder="Entrez votre adresse complète"
-                                    required
-                                />
+                                <input type="text" id="address" name="address" value="{{ old('address') }}"
+                                    placeholder="Entrez votre adresse complète" required />
 
                             </div>
                             @error('address') <span class="nutritrace-register-error">{{ $message }}</span> @enderror
@@ -413,47 +367,29 @@
                             <label for="password">Mot de passe</label>
 
                             <div class="nutritrace-register-password-wrapper">
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                    width="20"
-                                    height="20"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="#0b4145"
-                                    stroke-width="2"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    class="nutritrace-register-input-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                    fill="none" stroke="#0b4145" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="nutritrace-register-input-icon">
                                     <circle cx="12" cy="16" r="1"></circle>
                                     <rect width="18" height="12" x="3" y="10" rx="2"></rect>
                                     <path d="M7 10V7a5 5 0 0 1 9.33-2.5"></path>
                                 </svg>
 
-                                <input
-                                    type="password"
-                                    id="password"
-                                    name="password"
-                                    placeholder="••••••••"
-                                    required
-                                    autocomplete="new-password"
-                                />
+                                <input type="password" id="password" name="password" placeholder="••••••••" required
+                                    autocomplete="new-password" />
 
-                                <button
-                                    type="button"
-                                    class="nutritrace-register-password-toggle"
+                                <button type="button" class="nutritrace-register-password-toggle"
                                     onclick="togglePassword('password', this)">
-                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                        width="20"
-                                        height="20"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="#0b4145"
-                                        stroke-width="2"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        class="lucide lucide-eye-off">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                        fill="none" stroke="#0b4145" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" class="lucide lucide-eye-off">
                                         <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path>
-                                        <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c5 0 8.27 4.5 9.5 7a13.16 13.16 0 0 1-1.67 2.68"></path>
-                                        <path d="M6.61 6.61A13.52 13.52 0 0 0 2.5 12c1.23 2.5 4.5 7 9.5 7a10.43 10.43 0 0 0 2.27-.25"></path>
+                                        <path
+                                            d="M10.73 5.08A10.43 10.43 0 0 1 12 5c5 0 8.27 4.5 9.5 7a13.16 13.16 0 0 1-1.67 2.68">
+                                        </path>
+                                        <path
+                                            d="M6.61 6.61A13.52 13.52 0 0 0 2.5 12c1.23 2.5 4.5 7 9.5 7a10.43 10.43 0 0 0 2.27-.25">
+                                        </path>
                                         <line x1="2" y1="2" x2="22" y2="22"></line>
                                     </svg>
                                 </button>
@@ -466,47 +402,29 @@
                             <label for="password_confirmation">Confirmer le mot de passe</label>
 
                             <div class="nutritrace-register-password-wrapper">
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                    width="20"
-                                    height="20"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="#0b4145"
-                                    stroke-width="2"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    class="nutritrace-register-input-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                    fill="none" stroke="#0b4145" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="nutritrace-register-input-icon">
                                     <circle cx="12" cy="16" r="1"></circle>
                                     <rect width="18" height="12" x="3" y="10" rx="2"></rect>
                                     <path d="M7 10V7a5 5 0 0 1 9.33-2.5"></path>
                                 </svg>
 
-                                <input
-                                    type="password"
-                                    id="password_confirmation"
-                                    name="password_confirmation"
-                                    placeholder="••••••••"
-                                    required
-                                    autocomplete="new-password"
-                                />
+                                <input type="password" id="password_confirmation" name="password_confirmation"
+                                    placeholder="••••••••" required autocomplete="new-password" />
 
-                                <button
-                                    type="button"
-                                    class="nutritrace-register-password-toggle"
+                                <button type="button" class="nutritrace-register-password-toggle"
                                     onclick="togglePassword('password_confirmation', this)">
-                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                        width="20"
-                                        height="20"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="#0b4145"
-                                        stroke-width="2"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        class="lucide lucide-eye-off">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                        fill="none" stroke="#0b4145" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" class="lucide lucide-eye-off">
                                         <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path>
-                                        <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c5 0 8.27 4.5 9.5 7a13.16 13.16 0 0 1-1.67 2.68"></path>
-                                        <path d="M6.61 6.61A13.52 13.52 0 0 0 2.5 12c1.23 2.5 4.5 7 9.5 7a10.43 10.43 0 0 0 2.27-.25"></path>
+                                        <path
+                                            d="M10.73 5.08A10.43 10.43 0 0 1 12 5c5 0 8.27 4.5 9.5 7a13.16 13.16 0 0 1-1.67 2.68">
+                                        </path>
+                                        <path
+                                            d="M6.61 6.61A13.52 13.52 0 0 0 2.5 12c1.23 2.5 4.5 7 9.5 7a10.43 10.43 0 0 0 2.27-.25">
+                                        </path>
                                         <line x1="2" y1="2" x2="22" y2="22"></line>
                                     </svg>
                                 </button>
@@ -515,8 +433,10 @@
 
                     </div>
 
+
+
                     <label class="nutritrace-register-terms">
-                        <input type="checkbox" name="terms" required />
+                        <input type="checkbox" name="terms" required id="terms" />
 
                         <span>
                             J’accepte les
@@ -525,6 +445,16 @@
                             <a href="#">politique de confidentialité</a>.
                         </span>
                     </label>
+
+
+
+                    <!-- Vérification de sécurité (reCAPTCHA) -->
+                    <div class="nutritrace-register-recaptcha" id="recaptcha-container" style="display: none;">
+                        <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}"></div>
+                        @error('g-recaptcha-response')
+                            <span class="nutritrace-register-error">{{ $message }}</span>
+                        @enderror
+                    </div>
 
                     <!-- Submit button -->
                     <button type="submit" class="nutritrace-register-submit">
@@ -539,7 +469,7 @@
                 </form>
 
 
-             
+
             </div>
         </section>
 
@@ -589,9 +519,18 @@
     `;
             }
         }
+
+        /** show recaptcha */
+        const termsCheckbox = document.getElementById('terms');
+        const recaptchaContainer = document.getElementById('recaptcha-container');
+
+        termsCheckbox.addEventListener('change', function () {
+            if (this.checked) {
+                recaptchaContainer.style.display = '';
+            }
+        });
     </script>
 
 </body>
 
 </html>
-

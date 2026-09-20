@@ -390,3 +390,13 @@ body {
   color: #c0392b;
   font-size: 11px;
 }
+
+.nutritrace-login-status {
+  margin-bottom: 18px;
+  padding: 12px 14px;
+  border: 1px solid #b9dfc1;
+  background: #effaf1;
+  color: #246b32;
+  font-size: 13px;
+  line-height: 1.5;
+}

@@ -29,13 +29,14 @@ class RegisterRequest extends FormRequest
             'city' => ['nullable', 'string', 'max:100'],
             'address' => ['nullable', 'string', 'max:255'],
             'terms' => ['accepted'],
+            'g-recaptcha-response' => ['required'],
         ];
     }
 
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
-            $secret = env('RECAPTCHA_SECRET_KEY');
+            $secret = config('services.recaptcha.secret_key');
             $token = $this->input('g-recaptcha-response');
 
             // reCAPTCHA est vérifié uniquement lorsqu'une clé secrète et un token sont fournis.
