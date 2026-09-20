@@ -6,6 +6,10 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PendingApprovalController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleSelectionController;
+use App\Models\User;
+use App\Services\TwoFactorService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -23,15 +27,78 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('role-selection', [RoleSelectionController::class, 'create'])->name('role-selection.create');
     Route::post('role-selection', [RoleSelectionController::class, 'store'])->name('role-selection.store');
-    
+
     Route::get('pending-approval', PendingApprovalController::class)->name('pending-approval');
 
     Route::get('profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('profile', [ProfileController::class, 'update'])->name('profile.update');
-    
+
     Route::middleware('role.selected')->group(function () {
         Route::get('dashboard', DashboardController::class)->name('dashboard');
     });
-    
+
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+});
+
+
+/** 2fa routes (guest — user isn't fully authenticated yet at this point) */
+Route::middleware('guest')->group(function () {
+    Route::get('/2fa', function (TwoFactorService $twoFactor) {
+        $user = User::find(session('2fa_user_id'));
+
+        if (! $user) {
+            return redirect()->route('login');
+        }
+
+        $twoFactor->generateAndSend($user);
+
+        return view('auth.2fa', [
+            'maskedEmail' => $twoFactor->maskEmail($user->email),
+        ]);
+    })->name('2fa');
+
+    Route::post('/2fa/verify', function (Request $request, TwoFactorService $twoFactor) {
+        $request->validate(['code' => 'required|digits:6']);
+
+        $user = User::find(session('2fa_user_id'));
+
+        if (! $user) {
+            return redirect()->route('login');
+        }
+
+        if (! $twoFactor->verify($request->code)) {
+            return back()->withErrors(['code' => 'Code invalide ou expiré.']);
+        }
+
+        // Mark the account verified now that the code has been confirmed.
+        if (is_null($user->email_verified_at)) {
+            $user->forceFill(['email_verified_at' => now()])->save();
+        }
+
+        $remember = session('2fa_remember', false);
+        session()->forget(['2fa_user_id', '2fa_remember']);
+
+        Auth::login($user, $remember);
+        $request->session()->regenerate();
+
+        // Check if user already has a role (existing user)
+        if ($user->hasAnyRole(['producteur', 'transformateur', 'distributeur', 'consommateur'])) {
+            return redirect()->intended(route('dashboard'));
+        }
+
+        // New user without role - redirect to role selection
+        return redirect()->route('role-selection.create');
+    })->name('2fa.verify');
+
+    Route::post('/2fa/resend', function (TwoFactorService $twoFactor) {
+        $user = User::find(session('2fa_user_id'));
+
+        if (! $user) {
+            return response()->json(['status' => 'error'], 401);
+        }
+
+        $twoFactor->generateAndSend($user);
+
+        return response()->json(['status' => 'sent']);
+    })->name('2fa.resend');
 });

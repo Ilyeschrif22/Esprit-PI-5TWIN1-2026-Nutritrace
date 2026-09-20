@@ -1,60 +1,794 @@
-﻿<!DOCTYPE html>
-<html lang="fr">
+<!DOCTYPE html>
+<html lang="en">
+
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tableau de bord | NutriTrace</title>
-    <style>
-        :root { --ink:#073d3d; --muted:#607c85; --green:#4eaa58; --soft:#e4f5e4; --line:#dce9ec; --canvas:#f4f9f9; --shadow:0 8px 26px rgba(16,73,73,.06); }
-        * { box-sizing:border-box; } body { margin:0; background:var(--canvas); color:var(--ink); font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; } button,input { font:inherit; } button { cursor:pointer; }
-        .shell { display:flex; min-height:100vh; } .sidebar { width:246px; flex:0 0 246px; display:flex; flex-direction:column; padding:24px 14px 18px; background:linear-gradient(180deg,#064642,#033c3b); color:#fff; }
-        .brand { display:flex; align-items:center; gap:10px; padding:0 12px 28px; } .brand img { width:34px; height:42px; object-fit:contain; } .brand-name { font-size:18px; font-weight:800; letter-spacing:-.6px; } .brand-tag { display:block; margin-top:2px; color:#74d67a; font-size:8px; font-weight:800; letter-spacing:.8px; }
-        .nav { display:grid; gap:4px; } .nav a { display:flex; align-items:center; gap:12px; min-height:40px; padding:0 12px; border-radius:7px; color:#d4eeee; text-decoration:none; font-size:13px; font-weight:600; } .nav a:hover,.nav a.active { background:#55ad59; color:#fff; } .nav-icon { width:18px; text-align:center; font-size:16px; } .spacer { flex:1; }
-        .sustain { padding:18px 14px 14px; border:1px solid rgba(164,235,183,.22); border-radius:8px; background:rgba(52,142,103,.18); color:#d7eeee; font-size:11px; line-height:1.55; } .sustain strong { display:block; margin-bottom:3px; color:#fff; font-size:13px; } .leaf { display:block; margin-bottom:8px; color:#8edc4a; font-size:30px; line-height:1; }
-        .main { min-width:0; flex:1; } .topbar { display:flex; align-items:center; gap:18px; min-height:64px; padding:0 30px; border-bottom:1px solid var(--line); background:rgba(255,255,255,.9); } .search { position:relative; width:min(510px,100%); } .search input { width:100%; height:36px; padding:0 14px 0 38px; border:1px solid var(--line); border-radius:6px; color:var(--ink); outline:0; font-size:12px; } .search span { position:absolute; top:8px; left:14px; color:#5d8590; font-size:10px; } .top-actions { display:flex; align-items:center; gap:20px; margin-left:auto; } .bell { position:relative; font-size:11px; color:var(--ink); } .badge { position:absolute; top:-8px; right:-8px; display:grid; place-items:center; width:16px; height:16px; border-radius:50%; background:var(--green); color:#fff; font-size:9px; } .user { display:flex; align-items:center; gap:9px; color:var(--ink); font-size:11px; text-decoration:none; } .avatar { display:grid; place-items:center; width:30px; height:30px; border-radius:50%; background:#e2eff0; font-size:9px; } .user strong { display:block; font-size:11px; } .user small { color:var(--muted); }
-        .content { max-width:1420px; margin:0 auto; padding:28px 30px 36px; } .intro { display:flex; align-items:end; justify-content:space-between; gap:20px; margin-bottom:22px; } h1 { margin:0 0 4px; font-size:clamp(23px,2.4vw,31px); letter-spacing:-.9px; } .intro p { margin:0; color:var(--muted); font-size:12px; } .date { color:var(--green); font-size:12px; font-weight:700; text-align:right; } .date small { color:var(--muted); font-weight:400; }
-        .kpis { display:grid; grid-template-columns:repeat(6,minmax(130px,1fr)); gap:12px; margin-bottom:14px; } .panel,.kpi { border:1px solid var(--line); border-radius:7px; background:#fff; box-shadow:var(--shadow); } .kpi { padding:14px 13px 12px; } .kpi-head { display:flex; align-items:center; justify-content:space-between; color:var(--muted); font-size:11px; } .kpi-icon { display:grid; place-items:center; width:31px; height:31px; border-radius:9px; background:var(--soft); color:#23853c; font-size:17px; } .kpi strong { display:block; margin-top:8px; font-size:22px; } .trend { margin-top:7px; color:#42a34b; font-size:10px; font-weight:700; } .trend span { color:var(--muted); font-weight:400; }
-        .grid { display:grid; grid-template-columns:1.05fr 1.05fr 1.65fr; gap:14px; margin-bottom:14px; } .panel { min-width:0; padding:16px; } .panel-title { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; font-size:13px; font-weight:800; } .panel-title a { color:var(--green); font-size:10px; font-weight:700; text-decoration:none; } .select { border:1px solid var(--line); border-radius:16px; padding:6px 10px; color:var(--muted); background:#fff; font-size:10px; }
-        .donut-wrap { display:flex; align-items:center; gap:22px; min-height:138px; } .donut { position:relative; width:124px; height:124px; flex:0 0 124px; border-radius:50%; background:conic-gradient(#46a85b 0 28%,#79bd5e 28% 52%,#18a89f 52% 67%,#35a7c1 67% 79%,#a6c75d 79% 87%,#c5dbcf 87%); } .donut:after { content:""; position:absolute; inset:28px; border-radius:50%; background:#fff; } .donut-label { position:absolute; z-index:1; inset:0; display:grid; place-content:center; text-align:center; font-size:21px; font-weight:800; } .donut-label small { display:block; color:var(--muted); font-size:9px; font-weight:500; } .legend { display:grid; gap:8px; min-width:112px; color:var(--muted); font-size:10px; } .legend div { display:flex; justify-content:space-between; gap:12px; } .legend i { display:inline-block; width:8px; height:8px; margin-right:5px; border-radius:50%; background:#46a85b; } .legend b { color:var(--ink); }
-        .line-chart { position:relative; height:150px; overflow:hidden; padding:5px 0 20px 22px; background:repeating-linear-gradient(to bottom,transparent 0 34px,#edf3f3 35px 36px); } .line-chart:before { content:"800\A 600\A 400\A 200"; white-space:pre; position:absolute; left:0; top:2px; color:var(--muted); font-size:8px; line-height:35px; } .line-chart svg { width:100%; height:100%; overflow:visible; } .chart-labels { display:flex; justify-content:space-around; margin:4px 0 0 22px; color:var(--muted); font-size:9px; }
-        .trace-map { display:grid; grid-template-columns:1fr 112px; min-height:170px; overflow:hidden; border-radius:6px; background:#d9e7d0; } .map-art { position:relative; overflow:hidden; background:linear-gradient(145deg,#9dbb85,#d5d89a 38%,#8cac7e 39% 54%,#d7c990 55% 70%,#79a675 71%); } .map-art:before { content:""; position:absolute; inset:-20px; opacity:.35; background:repeating-linear-gradient(65deg,transparent 0 32px,#fff 33px 35px,transparent 36px 58px),repeating-linear-gradient(-25deg,transparent 0 45px,#427c63 46px 48px,transparent 49px 86px); transform:rotate(-10deg); } .route { position:absolute; left:15%; right:15%; top:47%; height:2px; background:#fff; transform:rotate(-22deg); box-shadow:0 0 0 1px #3e9860; } .pin { position:absolute; z-index:1; display:grid; place-items:center; width:26px; height:26px; border:2px solid #fff; border-radius:50%; background:#3c9d65; color:#fff; font-size:11px; box-shadow:0 2px 5px #42684e; } .pin.one { left:15%; top:29%; } .pin.two { left:48%; top:43%; background:#1b8d99; } .pin.three { right:15%; bottom:17%; background:#f6a11b; } .map-chip { position:absolute; z-index:2; padding:5px 7px; border-radius:4px; background:rgba(3,70,67,.88); color:#fff; font-size:8px; } .map-chip.one { left:10%; top:12%; } .map-chip.two { left:41%; top:24%; } .map-chip.three { right:5%; bottom:5%; } .trace-facts { display:grid; gap:14px; padding:14px 12px; background:#fff; color:var(--muted); font-size:9px; } .trace-facts strong { display:block; margin-top:4px; color:var(--ink); font-size:12px; }
-        .lower { grid-template-columns:1.05fr 1.05fr 1.25fr 1.15fr; } .bars { display:flex; align-items:end; justify-content:space-around; height:137px; padding:10px 10px 0; border-bottom:1px solid var(--line); } .bar { display:flex; flex-direction:column; align-items:center; justify-content:end; gap:5px; height:100%; color:var(--muted); font-size:9px; } .bar i { display:block; width:28px; min-height:5px; border-radius:4px 4px 0 0; background:#55ac5d; } .bar:nth-child(2) i { background:#19a28f; } .bar:nth-child(3) i { background:#0d5960; } .bar:nth-child(4) i { background:#6b9eaa; } .impact-list,.activity-list { display:grid; gap:12px; } .impact-item,.activity-item { display:flex; align-items:center; gap:9px; font-size:10px; } .impact-icon { display:grid; place-items:center; width:28px; height:28px; border-radius:50%; background:var(--soft); color:#27904b; font-size:15px; } .impact-item span,.activity-item span { display:block; color:var(--muted); } .impact-item strong { display:block; margin-top:2px; font-size:12px; } .activity-item { align-items:flex-start; padding-bottom:8px; border-bottom:1px solid #edf3f3; } .activity-item:last-child { border-bottom:0; } .activity-time { margin-left:auto; color:var(--muted); white-space:nowrap; font-size:9px; }
-        @media (max-width:1100px) { .sidebar { width:205px; flex-basis:205px; } .kpis { grid-template-columns:repeat(3,1fr); } .grid,.lower { grid-template-columns:repeat(2,1fr); } .trace-panel { grid-column:span 2; } } @media (max-width:720px) { .shell { display:block; } .sidebar { width:100%; padding:12px; } .brand { padding-bottom:12px; } .nav { grid-template-columns:repeat(3,1fr); } .nav a { justify-content:center; padding:7px 4px; font-size:10px; } .nav a span:last-child { display:none; } .spacer,.sustain { display:none; } .topbar { padding:12px 16px; } .user { display:none; } .content { padding:20px 16px; } .intro { align-items:flex-start; flex-direction:column; } .date { text-align:left; } .kpis,.grid,.lower { grid-template-columns:1fr; } .trace-panel { grid-column:auto; } }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
+    <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
+
 <body>
-    @php($user = auth()->user())
-    <div class="shell">
-        <aside class="sidebar">
-            <div class="brand"><img src="{{ asset('images/nutritrace-logo.png') }}" alt="NutriTrace"><div><span class="brand-name">NutriTrace</span><span class="brand-tag">TRAÃ‡ABILITÃ‰ ALIMENTAIRE</span></div></div>
-            <nav class="nav" aria-label="Navigation principale">
-                <a class="active" href="{{ route('dashboard') }}"><span class="nav-icon">âŒ‚</span><span>Tableau de bord</span></a><a href="#produits"><span class="nav-icon">â—ˆ</span><span>Produits</span></a><a href="#lots"><span class="nav-icon">â–±</span><span>Lots</span></a><a href="#acteurs"><span class="nav-icon">â™™</span><span>Acteurs</span></a><a href="#tracabilite"><span class="nav-icon">â—Ž</span><span>TraÃ§abilitÃ©</span></a><a href="#transports"><span class="nav-icon">â–°</span><span>Transports</span></a><a href="#certifications"><span class="nav-icon">â™¢</span><span>Certifications</span></a><a href="#documents"><span class="nav-icon">â–¤</span><span>Documents</span></a><a href="#impact"><span class="nav-icon">â—’</span><span>Impact environnemental</span></a><a href="#cartographie"><span class="nav-icon">âŒ–</span><span>Cartographie</span></a><a href="#statistiques"><span class="nav-icon">â–¥</span><span>Statistiques</span></a><a href="#utilisateurs"><span class="nav-icon">â™§</span><span>Utilisateurs</span></a>
-            </nav>
-            <div class="spacer"></div><div class="sustain"><span class="leaf">â—’</span><strong>Une alimentation plus sÃ»re et plus durable</strong>avec NutriTrace</div>
-        </aside>
-        <main class="main">
-            <header class="topbar"><label class="search"><span>Search</span><input type="search" placeholder="Rechercher un produit, un lot, un acteur..."></label><div class="top-actions"><span class="bell">Notifications <b class="badge">3</b></span><a class="user" href="{{ route('profile.edit') }}" aria-label="Modifier mon profil"><span class="avatar">User</span><div><strong>{{ $user->fullname }}</strong><small>{{ ucfirst($user->getRoleNames()->first() ?? 'Utilisateur') }}</small></div><span>View</span></a></div></header>
-            <div class="content">
-                <div class="intro"><div><h1>Bonjour, {{ $user->fullname }} ðŸ‘‹</h1><p>Voici un aperÃ§u de votre activitÃ© sur la plateforme NutriTrace.</p></div><div class="date">â–£ &nbsp;16 septembre 2026<br><small>DerniÃ¨re mise Ã  jour : 10:24</small></div></div>
-                <section class="kpis">
-                    @foreach ([['Produits','â—ˆ','1 245','+12%'],['Lots','â–±','582','+8%'],['Acteurs','â™™','124','+15%'],['Certifications','â™¢','87','+10%'],['Transports','â–°','1 832','+18%'],['Ã‰missions COâ‚‚','â—’','4,2 t','-6%']] as $kpi)
-                        <article class="kpi"><div class="kpi-head"><span>{{ $kpi[0] }}</span><span class="kpi-icon">{{ $kpi[1] }}</span></div><strong>{{ $kpi[2] }}</strong><div class="trend">â†— {{ $kpi[3] }} <span>vs mois dernier</span></div></article>
-                    @endforeach
-                </section>
-                <section class="grid">
-                    <article class="panel" id="produits"><div class="panel-title">Produits par catÃ©gorie</div><div class="donut-wrap"><div class="donut"><div class="donut-label">1 245<small>produits</small></div></div><div class="legend"><div><span><i></i>Fruits</span><b>28%</b></div><div><span><i style="background:#79bd5e"></i>LÃ©gumes</span><b>24%</b></div><div><span><i style="background:#18a89f"></i>CÃ©rÃ©ales</span><b>15%</b></div><div><span><i style="background:#35a7c1"></i>Produits laitiers</span><b>12%</b></div><div><span><i style="background:#a6c75d"></i>Viandes</span><b>8%</b></div></div></div></article>
-                    <article class="panel" id="lots"><div class="panel-title">Ã‰volution des lots <span class="select">6 derniers moisâŒ„</span></div><div class="line-chart"><svg viewBox="0 0 400 120" preserveAspectRatio="none"><path d="M0 103 C50 94,73 96,106 89 S160 88,195 80 S245 82,282 62 S332 58,400 21" fill="none" stroke="#48a85a" stroke-width="3"/><path d="M0 103 C50 94,73 96,106 89 S160 88,195 80 S245 82,282 62 S332 58,400 21 V120 H0Z" fill="#dff3df" opacity=".75"/></svg></div><div class="chart-labels"><span>Avr</span><span>Mai</span><span>Juin</span><span>Juil</span><span>AoÃ»t</span><span>Sep</span></div></article>
-                    <article class="panel trace-panel" id="tracabilite"><div class="panel-title">TraÃ§abilitÃ© du lot #LOT-2026-001 <a href="#cartographie">Voir la carte complÃ¨te â†’</a></div><div class="trace-map"><div class="map-art"><span class="route"></span><span class="pin one">â—‰</span><span class="pin two">â–£</span><span class="pin three">â–°</span><span class="map-chip one">Producteur<br><b>Nabeul</b></span><span class="map-chip two">Transformateur<br><b>Tunis</b></span><span class="map-chip three">Distributeur<br><b>Sfax</b></span></div><div class="trace-facts"><div>Distance totale<strong>85 km</strong></div><div>COâ‚‚ estimÃ©e<strong>24.8 kg</strong></div><div>DurÃ©e totale<strong>2 h 45</strong></div></div></div></article>
-                </section>
-                <section class="grid lower">
-                    <article class="panel" id="acteurs"><div class="panel-title">Acteurs par type</div><div class="bars"><div class="bar"><i style="height:82%"></i>Producteurs</div><div class="bar"><i style="height:55%"></i>Transformateurs</div><div class="bar"><i style="height:40%"></i>Distributeurs</div><div class="bar"><i style="height:20%"></i>Autres</div></div></article>
-                    <article class="panel"><div class="panel-title">Statut des lots</div><div class="donut-wrap"><div class="donut" style="background:conic-gradient(#46a85b 0 52%,#18a89f 52% 70%,#7cc6b8 70% 92%,#c5dbcf 92%)"><div class="donut-label">582<small>lots</small></div></div><div class="legend"><div><span><i></i>En cours</span><b>52%</b></div><div><span><i style="background:#18a89f"></i>ExpirÃ©</span><b>18%</b></div><div><span><i style="background:#7cc6b8"></i>Complet</span><b>22%</b></div><div><span><i style="background:#c5dbcf"></i>En attente</span><b>8%</b></div></div></div></article>
-                    <article class="panel" id="impact"><div class="panel-title">Impact environnemental</div><div class="impact-list"><div class="impact-item"><b class="impact-icon">â˜</b><div><span>COâ‚‚ total</span><strong>4,2 t <em class="trend">â†“ -6%</em></strong></div></div><div class="impact-item"><b class="impact-icon">â—‰</b><div><span>Eau consommÃ©e</span><strong>12 480 L <em class="trend">â†“ -8%</em></strong></div></div><div class="impact-item"><b class="impact-icon">ÏŸ</b><div><span>Ã‰nergie consommÃ©e</span><strong>8 760 kWh <em class="trend">â†“ -5%</em></strong></div></div><div class="impact-item"><b class="impact-icon">âŒ–</b><div><span>Distance totale</span><strong>12 430 km <em class="trend">â†“ -12%</em></strong></div></div></div></article>
-                    <article class="panel"><div class="panel-title">ActivitÃ© rÃ©cente <a href="#">Voir tout â†’</a></div><div class="activity-list"><div class="activity-item"><b class="impact-icon">âœ“</b><div><span>Un nouveau lot a Ã©tÃ© ajoutÃ©</span>LOT-2026-001</div><small class="activity-time">10:24</small></div><div class="activity-item"><b class="impact-icon">â™¢</b><div><span>Certification BIO vÃ©rifiÃ©e</span>LOT-2026-001</div><small class="activity-time">09:47</small></div><div class="activity-item"><b class="impact-icon">â–°</b><div><span>Transport enregistrÃ©</span>Nabeul â†’ Tunis</div><small class="activity-time">08:32</small></div><div class="activity-item"><b class="impact-icon">â™™</b><div><span>Un utilisateur a mis Ã  jour un produit</span>Huile d'olive</div><small class="activity-time">07:15</small></div></div></article>
-                </section>
-                <form method="POST" action="{{ route('logout') }}" style="margin-top:16px;text-align:right;">@csrf<button type="submit" style="border:0;background:transparent;color:var(--muted);font-size:11px;text-decoration:underline;">Se dÃ©connecter</button></form>
+
+    <!-- SideBar -->
+    @include('components.sidebar', ['active' => 'dashboard'])
+
+    <div class="nutritrace-main-container">
+        <div class="nutritrace-navbar">
+    
+            <!-- Search -->
+            <div class="nutritrace-search">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.3-4.3"></path>
+                </svg>
+
+            <input type="text" placeholder="Rechercher un produit, un lot, un acteur...">
+        </div>
+
+
+        <!-- Right side -->
+        <div class="nutritrace-navbar-right">
+
+            <!-- Notifications -->
+            <div class="nutritrace-notifications">
+
+                <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+
+                <span class="notification-badge">3</span>
+
             </div>
-        </main>
+
+
+            <!-- Profile -->
+            <div class="nutritrace-profile" id="profileTrigger">
+
+                <div class="nutritrace-profile-avatar">
+                    <img src="{{ asset('images/avatar.png') }}" class="avatar-image" alt="Photo de profil">
+                </div>
+
+                <div class="nutritrace-profile-info">
+                    <span class="profile-name">{{ $user->fullname }}</span>
+                    <span class="profile-role">
+                        {{ $user->roles->isNotEmpty() ? ucfirst($user->roles->first()->name) : 'Utilisateur' }}
+                    </span>
+                </div>
+
+                <!-- Dropdown arrow -->
+                <svg class="profile-arrow" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m6 9 6 6 6-6"></path>
+                </svg>
+
+                <!-- Dropdown menu -->
+                <div class="profile-dropdown" id="profileDropdown">
+
+                    <div class="profile-dropdown-header">
+                        <div class="profile-dropdown-avatar">
+                            <img src="{{ asset('images/avatar.png') }}" class="avatar-image" alt="Photo de profil">
+                        </div>
+                        <div class="profile-dropdown-header-info">
+                            <span class="dropdown-name">{{ $user->fullname }}</span>
+                            <span class="dropdown-email">{{ $user->email }}</span>
+                        </div>
+                    </div>
+
+               
+                    <div class="profile-dropdown-divider"></div>
+
+                    <ul class="profile-dropdown-list">
+                        <li class="profile-dropdown-item">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <circle cx="12" cy="8" r="5" />
+                                <path d="M20 21a8 8 0 0 0-16 0" />
+                            </svg>
+                            Voir le profil
+                        </li>
+
+                        <li class="profile-dropdown-item">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path
+                                    d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+                                <circle cx="12" cy="12" r="3" />
+                            </svg>
+                            Paramètres
+                        </li>
+
+                        <div class="profile-dropdown-divider"></div>
+
+                        <li class="profile-dropdown-item">
+                            <form method="POST" action="{{ route('logout') }}" class="profile-dropdown-logout">
+                                @csrf
+                                <button type="submit" class="profile-dropdown-item-btn danger">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round">
+                                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                                        <polyline points="16 17 21 12 16 7" />
+                                        <line x1="21" y1="12" x2="9" y2="12" />
+                                    </svg>
+                                    Déconnexion
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
+    <div class="nutritrace-dashboard-content">
+
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+
+            <div>
+                <h1>Bonjour {{ $user->fullname }} 👋</h1>
+                <p>Voici un aperçu de l'activité sur votre plateforme NutriTrace.</p>
+            </div>
+
+            <div class="dashboard-date">
+                <div class="date-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M8 2v4" />
+                        <path d="M16 2v4" />
+                        <rect width="18" height="18" x="3" y="4" rx="2" />
+                        <path d="M3 10h18" />
+                    </svg>
+                </div>
+
+                <div>
+                    <strong>16 septembre 2026</strong>
+                    <span>Dernière mise à jour : 10:24</span>
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- Statistics Cards -->
+        <div class="dashboard-stats">
+
+
+            <!-- Produits -->
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m21 16-9 5-9-5V8l9-5 9 5z" />
+                        <path d="m3.3 7 8.7 5 8.7-5" />
+                        <path d="M12 22V12" />
+                    </svg>
+                </div>
+
+                <span class="stat-title">Produits</span>
+
+                <span class="stat-number">1 245</span>
+
+                <span class="stat-change positive">
+                    ↑ +12%
+                </span>
+
+                <span class="stat-period">vs mois dernier</span>
+
+            </div>
+
+
+            <!-- Lots -->
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m12 3-8 4 8 4 8-4-8-4Z" />
+                        <path d="m4 12 8 4 8-4" />
+                        <path d="m4 17 8 4 8-4" />
+                    </svg>
+                </div>
+
+                <span class="stat-title">Lots</span>
+
+                <span class="stat-number">582</span>
+
+                <span class="stat-change positive">
+                    ↑ +8%
+                </span>
+
+                <span class="stat-period">vs mois dernier</span>
+
+            </div>
+
+
+            <!-- Acteurs -->
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg>
+                </div>
+
+                <span class="stat-title">Acteurs</span>
+
+                <span class="stat-number">124</span>
+
+                <span class="stat-change positive">
+                    ↑ +15%
+                </span>
+
+                <span class="stat-period">vs mois dernier</span>
+
+            </div>
+
+
+            <!-- Certifications -->
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
+                        <path d="m9 12 2 2 4-4" />
+                    </svg>
+                </div>
+
+                <span class="stat-title">Certifications</span>
+
+                <span class="stat-number">87</span>
+
+                <span class="stat-change positive">
+                    ↑ +10%
+                </span>
+
+                <span class="stat-period">vs mois dernier</span>
+
+            </div>
+
+
+            <!-- Transports -->
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M10 17h4V5H2v12h3" />
+                        <path d="M14 8h4l4 4v5h-3" />
+                        <circle cx="7.5" cy="17.5" r="2.5" />
+                        <circle cx="16.5" cy="17.5" r="2.5" />
+                    </svg>
+                </div>
+
+                <span class="stat-title">Transports</span>
+
+                <span class="stat-number">1 832</span>
+
+                <span class="stat-change positive">
+                    ↑ +18%
+                </span>
+
+                <span class="stat-period">vs mois dernier</span>
+
+            </div>
+
+
+            <!-- Émissions CO2 -->
+            <div class="stat-card">
+
+                <div class="stat-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+                        <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+                    </svg>
+                </div>
+
+                <span class="stat-title">Émissions CO₂</span>
+
+                <span class="stat-number">4,2 t</span>
+
+                <span class="stat-change negative">
+                    ↓ -6%
+                </span>
+
+                <span class="stat-period">vs mois dernier</span>
+
+            </div>
+
+        </div>
+
+
+        <!-- Row 2: category donut / lots trend / lot traceability map -->
+        <div class="insights-grid">
+
+            <!-- Produits par catégorie -->
+            <div class="chart-card">
+                <div class="chart-card-header">
+                    <h3>Produits par catégorie</h3>
+                </div>
+
+                <div class="donut-wrap">
+                    <div class="donut category-donut">
+                        <div class="donut-center">
+                            <strong>1 245</strong>
+                            <span>produits</span>
+                        </div>
+                    </div>
+
+                    <ul class="donut-legend">
+                        <li class="donut-legend-item">
+                            <span class="legend-dot" style="background:#1a5632"></span>
+                            <span class="legend-label">Fruits</span>
+                            <span class="legend-value">28%</span>
+                        </li>
+                        <li class="donut-legend-item">
+                            <span class="legend-dot" style="background:#2e7d32"></span>
+                            <span class="legend-label">Légumes</span>
+                            <span class="legend-value">24%</span>
+                        </li>
+                        <li class="donut-legend-item">
+                            <span class="legend-dot" style="background:#3fa796"></span>
+                            <span class="legend-label">Céréales</span>
+                            <span class="legend-value">15%</span>
+                        </li>
+                        <li class="donut-legend-item">
+                            <span class="legend-dot" style="background:#6ec6c2"></span>
+                            <span class="legend-label">Produits laitiers</span>
+                            <span class="legend-value">12%</span>
+                        </li>
+                        <li class="donut-legend-item">
+                            <span class="legend-dot" style="background:#a9dfd8"></span>
+                            <span class="legend-label">Viandes</span>
+                            <span class="legend-value">8%</span>
+                        </li>
+                        <li class="donut-legend-item">
+                            <span class="legend-dot" style="background:#dce7e4"></span>
+                            <span class="legend-label">Autres</span>
+                            <span class="legend-value">13%</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Évolution des lots -->
+            <div class="chart-card">
+                <div class="chart-card-header">
+                    <h3>Évolution des lots</h3>
+                    <button type="button" class="chart-action-chip">
+                        6 derniers mois
+                    </button>
+                </div>
+
+                <div class="lots-chart">
+                </div>
+            </div>
+
+            <!-- Traçabilité du lot -->
+            <div class="chart-card traceability-map-card">
+                <div class="chart-card-header">
+                    <h3>Traçabilité du lot #LOT-2026-001</h3>
+                    <button type="button" class="chart-action-chip primary">
+                        Voir la carte complète
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <path d="M5 12h14" />
+                            <path d="m12 5 7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+
+             <div class="traceability-map-visual">
+    <div id="traceability-map"></div>
+</div>
+            </div>
+
+        </div>
+
+
+        <!-- Row 3: actors bar chart / lot status / environmental impact / recent activity -->
+        <div class="secondary-grid">
+
+            <!-- Acteurs par type -->
+            <div class="chart-card">
+                <div class="chart-card-header">
+                    <h3>Acteurs par type</h3>
+                </div>
+
+                
+            </div>
+
+            <!-- Statut des lots -->
+            <div class="chart-card">
+                <div class="chart-card-header">
+                    <h3>Statut des lots</h3>
+                </div>
+
+                <div class="donut-wrap">
+                    <div class="donut status-donut">
+                        <div class="donut-center">
+                            <strong>582</strong>
+                            <span>lots</span>
+                        </div>
+                    </div>
+
+                    <ul class="donut-legend">
+                        <li class="donut-legend-item">
+                            <span class="legend-dot" style="background:#2e7d32"></span>
+                            <span class="legend-label">En cours</span>
+                            <span class="legend-value">52%</span>
+                        </li>
+                        <li class="donut-legend-item">
+                            <span class="legend-dot" style="background:#c65a4e"></span>
+                            <span class="legend-label">Expiré</span>
+                            <span class="legend-value">18%</span>
+                        </li>
+                        <li class="donut-legend-item">
+                            <span class="legend-dot" style="background:#3fa796"></span>
+                            <span class="legend-label">Complet</span>
+                            <span class="legend-value">22%</span>
+                        </li>
+                        <li class="donut-legend-item">
+                            <span class="legend-dot" style="background:#d7e0df"></span>
+                            <span class="legend-label">En attente</span>
+                            <span class="legend-value">8%</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Impact environnemental -->
+            <div class="chart-card">
+                <div class="chart-card-header">
+                    <h3>Impact environnemental</h3>
+                </div>
+
+            </div>
+
+            <!-- Activité récente -->
+            <div class="chart-card">
+                <div class="chart-card-header">
+                    <h3>Activité récente</h3>
+                    <a href="#" class="chart-action-chip">Voir tout</a>
+                </div>
+
+                <ul class="activity-list">
+                    <li class="activity-row">
+                        <div class="activity-icon icon-package">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" />
+                                <path d="m3.3 7 8.7 5 8.7-5" />
+                                <path d="M12 22V12" />
+                            </svg>
+                        </div>
+                        <div class="activity-info">
+                            <strong>Un nouveau lot a été ajouté</strong>
+                            <span>LOT-2026-001 – Tomate</span>
+                        </div>
+                        <span class="activity-time">10:24</span>
+                    </li>
+
+                    <li class="activity-row">
+                        <div class="activity-icon icon-shield">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />
+                                <path d="m9 12 2 2 4-4" />
+                            </svg>
+                        </div>
+                        <div class="activity-info">
+                            <strong>Certification BIO vérifiée</strong>
+                            <span>LOT-2026-001</span>
+                        </div>
+                        <span class="activity-time">09:47</span>
+                    </li>
+
+                    <li class="activity-row">
+                        <div class="activity-icon icon-truck">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2" />
+                                <path d="M15 18H9" />
+                                <path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14" />
+                                <circle cx="17" cy="18" r="2" />
+                                <circle cx="7" cy="18" r="2" />
+                            </svg>
+                        </div>
+                        <div class="activity-info">
+                            <strong>Transport enregistré</strong>
+                            <span>Nabeul → Tunis</span>
+                        </div>
+                        <span class="activity-time">08:32</span>
+                    </li>
+
+                    <li class="activity-row">
+                        <div class="activity-icon icon-user">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <circle cx="12" cy="8" r="5" />
+                                <path d="M20 21a8 8 0 0 0-16 0" />
+                            </svg>
+                        </div>
+                        <div class="activity-info">
+                            <strong>Un utilisateur a mis à jour un produit</strong>
+                            <span>Huile d'olive</span>
+                        </div>
+                        <span class="activity-time">07:15</span>
+                    </li>
+
+                    <li class="activity-row">
+                        <div class="activity-icon icon-file">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
+                                <path d="M14 2v4a2 2 0 0 0 2 2h4" />
+                                <path d="M10 9H8" />
+                                <path d="M16 13H8" />
+                                <path d="M16 17H8" />
+                            </svg>
+                        </div>
+                        <div class="activity-info">
+                            <strong>Document ajouté</strong>
+                            <span>Certificat d'origine</span>
+                        </div>
+                        <span class="activity-time">06:52</span>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+
+
+        <!-- Footer -->
+        <div class="dashboard-footer">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+                <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+            </svg>
+            <strong>NutriTrace</strong>
+            <span class="footer-divider">|</span>
+            <span>Plus de transparence pour une alimentation durable</span>
+        </div>
+
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="./script.js"></script>
+<script>
+    (function () {
+        var trigger = document.getElementById('profileTrigger');
+        var dropdown = document.getElementById('profileDropdown');
+
+        if (!trigger || !dropdown) return;
+
+        trigger.addEventListener('click', function (e) {
+            e.stopPropagation();
+            trigger.classList.toggle('open');
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!trigger.contains(e.target)) {
+                trigger.classList.remove('open');
+            }
+        });
+
+        dropdown.addEventListener('click', function (e) {
+            e.stopPropagation();
+        });
+    })();
+</script>
+<script>
+    (function () {
+        var canvas = document.getElementById('lotsChart');
+        if (!canvas || typeof Chart === 'undefined') return;
+
+        var labels = canvas.dataset.labels.split(',');
+        var values = canvas.dataset.values.split(',').map(Number);
+
+        var ctx = canvas.getContext('2d');
+        var gradient = ctx.createLinearGradient(0, 0, 0, canvas.clientHeight || 260);
+        gradient.addColorStop(0, 'rgba(46, 125, 50, 0.22)');
+        gradient.addColorStop(1, 'rgba(46, 125, 50, 0)');
+
+        var lastIndex = values.length - 1;
+        var pointRadii = values.map(function (_, i) { return i === lastIndex ? 5 : 4; });
+        var pointColors = values.map(function (_, i) { return i === lastIndex ? '#2e7d32' : '#ffffff'; });
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values,
+                    borderColor: '#2e7d32',
+                    backgroundColor: gradient,
+                    borderWidth: 3,
+                    tension: 0.35,
+                    fill: true,
+                    pointRadius: pointRadii,
+                    pointHoverRadius: pointRadii.map(function (r) { return r + 1; }),
+                    pointBackgroundColor: pointColors,
+                    pointBorderColor: '#2e7d32',
+                    pointBorderWidth: 2.5,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#163c45',
+                        titleFont: { family: 'Inter', size: 12, weight: '600' },
+                        bodyFont: { family: 'Inter', size: 13, weight: '600' },
+                        padding: 10,
+                        cornerRadius: 6,
+                        displayColors: false,
+                        callbacks: {
+                            label: function (item) { return item.formattedValue + ' lots'; }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: {
+                            font: { family: 'Inter', size: 14, weight: '600' },
+                            color: '#84969b'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        max: 800,
+                        ticks: {
+                            stepSize: 200,
+                            font: { family: 'Inter', size: 15, weight: '600' },
+                            color: '#84969b'
+                        },
+                        grid: { color: '#edf2f1' }
+                    }
+                }
+            }
+        });
+    })();
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const locations = [
+            [36.8065, 10.1815],
+            [36.8180, 10.1658],
+            [36.8320, 10.1850],
+            [36.8450, 10.1950]
+        ];
+
+        const map = L.map("traceability-map", {
+            zoomControl: true
+        }).setView([36.825, 10.18], 12);
+
+        L.tileLayer(
+            "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+            {
+                attribution:
+                    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                maxZoom: 19
+            }
+        ).addTo(map);
+
+        // Custom green pointer
+        const greenIcon = L.divIcon({
+            className: "custom-map-marker",
+            html: `
+                <div style="
+                    width: 32px;
+                    height: 32px;
+                    background: #2e7d32;
+                    border: 3px solid white;
+                    border-radius: 50% 50% 50% 0;
+                    transform: rotate(-45deg);
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                ">
+                    <span style="
+                        transform: rotate(45deg);
+                        color: white;
+                        font-weight: 700;
+                        font-size: 13px;
+                    "></span>
+                </div>
+            `,
+            iconSize: [32, 32],
+            iconAnchor: [16, 32],
+            popupAnchor: [0, -32]
+        });
+
+        // Add 4 markers
+        locations.forEach((location, index) => {
+
+            const icon = L.divIcon({
+                className: "custom-map-marker",
+                html: `
+                    <div style="
+                        width: 32px;
+                        height: 32px;
+                        background: #2e7d32;
+                        border: 3px solid white;
+                        border-radius: 50% 50% 50% 0;
+                        transform: rotate(-45deg);
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    ">
+                        <span style="
+                            transform: rotate(45deg);
+                            color: white;
+                            font-weight: 700;
+                            font-size: 13px;
+                        ">${index + 1}</span>
+                    </div>
+                `,
+                iconSize: [32, 32],
+                iconAnchor: [16, 32]
+            });
+
+            L.marker(location, {
+                icon: icon
+            })
+            .addTo(map)
+            .bindPopup(`
+                <strong>Lot ${index + 1}</strong><br>
+                Point de traçabilité ${index + 1}
+            `);
+        });
+
+        // Connect the 4 points
+        L.polyline(locations, {
+            color: "#2e7d32",
+            weight: 4,
+            opacity: 0.85
+        }).addTo(map);
+
+        // Fit map to all markers
+        map.fitBounds(locations, {
+            padding: [40, 40]
+        });
+
+    });
+</script>
 </body>
+
 </html>
