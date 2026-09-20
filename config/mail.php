@@ -49,6 +49,18 @@ return [
             'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
         ],
 
+        'password_reset_smtp' => [
+            'transport' => 'smtp',
+            'scheme' => env('PASSWORD_RESET_MAIL_SCHEME'),
+            'url' => env('PASSWORD_RESET_MAIL_URL'),
+            'host' => env('PASSWORD_RESET_MAIL_HOST', 'smtp.gmail.com'),
+            'port' => env('PASSWORD_RESET_MAIL_PORT', 587),
+            'username' => env('PASSWORD_RESET_MAIL_USERNAME'),
+            'password' => env('PASSWORD_RESET_MAIL_PASSWORD'),
+            'timeout' => null,
+            'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
+        ],
+
         'ses' => [
             'transport' => 'ses',
         ],
@@ -113,6 +125,11 @@ return [
     'from' => [
         'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
         'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),
+    ],
+
+    'password_reset_from' => [
+        'address' => env('PASSWORD_RESET_MAIL_FROM_ADDRESS', 'hello@example.com'),
+        'name' => env('PASSWORD_RESET_MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),
     ],
 
 ];

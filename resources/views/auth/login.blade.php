@@ -123,6 +123,10 @@
                     </p>
                 </div>
 
+                @if (session('status'))
+                    <p class="nutritrace-login-status">{{ session('status') }}</p>
+                @endif
+
                 <form class="nutritrace-login-form" method="POST" action="{{ route('login') }}">
                     @csrf
 
