@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Services\JwtService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -50,29 +51,19 @@ class AuthController extends Controller
             'token' => $token,
             'token_type' => 'Bearer',
             'expires_in' => env('JWT_EXPIRATION', 1440) * 60, // in seconds
-            'user' => [
-                'id' => $user->id,
-                'fullname' => $user->fullname,
-                'email' => $user->email,
-                'roles' => $user->roles->pluck('name'),
-            ],
+            'user' => $this->userPayload($user),
         ], 200);
     }
 
     /**
-     * Get the authenticated user information.
+     * Get the authenticated user information (profile).
      */
     public function me(Request $request)
     {
-        $user = $request->user();
+        $user = $request->user()->load('roles');
 
         return response()->json([
-            'user' => [
-                'id' => $user->id,
-                'fullname' => $user->fullname,
-                'email' => $user->email,
-                'roles' => $user->roles->pluck('name'),
-            ],
+            'user' => $this->userPayload($user, true),
         ]);
     }
 
@@ -82,9 +73,40 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         // For JWT, the client should simply discard the token
-        // Server-side JWT invalidation would require a blacklist or database storage
+        // Server-side JWT invalidation would require a blacklist or database storage.
+        // The authenticated user data is returned so the caller can confirm
+        // which account was logged out.
+        $user = $request->user()->load('roles');
+
         return response()->json([
             'message' => 'Successfully logged out',
+            'user' => $this->userPayload($user),
         ]);
+    }
+
+    /**
+     * Build the public user payload returned by the API.
+     */
+    protected function userPayload(User $user, bool $withTimestamps = false): array
+    {
+        $payload = [
+            'id' => $user->id,
+            'fullname' => $user->fullname,
+            'email' => $user->email,
+            'roles' => $user->roles->pluck('name'),
+            'cin' => $user->cin,
+            'phone' => $user->phone,
+            'birthdate' => $user->birthdate?->toDateString(),
+            'governorate' => $user->governorate,
+            'city' => $user->city,
+            'address' => $user->address,
+        ];
+
+        if ($withTimestamps) {
+            $payload['email_verified_at'] = $user->email_verified_at?->toDateTimeString();
+            $payload['created_at'] = $user->created_at?->toDateTimeString();
+        }
+
+        return $payload;
     }
 }
