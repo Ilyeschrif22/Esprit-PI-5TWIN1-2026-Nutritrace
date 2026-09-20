@@ -1,0 +1,476 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+
+
+:root {
+  --dark-teal: #003c3b;
+  --deep-teal: #004c49;
+  --text-color: #0b4145;
+
+  --mint-background: #eaf6f3;
+  --page-background: #f4f9f8;
+
+  --green: #3d9b45;
+  --light-green: #ddf3e2;
+
+  --border-color: #dce9ed;
+  --input-background: #ffffff;
+
+  --muted-text: #789096;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Inter", sans-serif;
+  background: var(--page-background);
+  color: var(--text-color);
+}
+
+.nutritrace-register-page {
+  display: flex;
+  min-height: 80vh;
+  width: 100%;
+}
+
+.nutritrace-register-feature-icon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+
+  width: 46px;
+  height: 46px;
+
+  border: none;
+  border-radius: 11px;
+
+  background: transparent;
+  color: #eaf6f3;
+}
+
+.nutritrace-register-feature-icon svg {
+  width: 44px;
+  height: 44px;
+  stroke: currentColor;
+}
+
+/** left container */
+.nutritrace-register-brand {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 20%;
+  min-height: 100vh;
+  padding: 22px 39px;
+  overflow: hidden;
+  background-color: #05342d;
+  color: white;
+}
+
+.nutritrace-register-brand-content {
+  position: relative;
+  z-index: 2;
+  max-width: 528px;
+}
+
+
+/** nutritrace logo */
+.nutritrace-logo{
+    height: 99px;
+    width: 99px;
+}
+
+.nutritrace-register-logo {
+  display: flex;
+  flex-direction: column;
+
+
+  width: 100%;
+  height: 143px;
+
+  border-radius: 13px;
+
+  color: #fff;
+
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.nutritrace-register-brand-text {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -1px;
+}
+
+.nutritrace-register-brand-text span {
+  color: #fff;
+}
+
+
+/* Texte de présentation */
+
+.nutritrace-register-eyebrow {
+  margin-bottom: 22px;
+
+  color: #8fd39a;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.nutritrace-register-brand h2 {
+  margin-bottom: 28px;
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -1.5px;
+}
+
+.nutritrace-register-description {
+  max-width: 429px;
+  margin-bottom: 53px;
+
+  color: #c4dfdb;
+  font-size: 17px;
+  line-height: 1.8;
+}
+
+
+/* Fonctionnalités */
+
+.nutritrace-register-features {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  height: 220px;
+}
+
+.nutritrace-register-feature {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+}
+
+
+
+.nutritrace-register-feature h3 {
+  margin-bottom: 7px;
+
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.nutritrace-register-feature p {
+  color: #a9cfca;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+
+
+.nutritrace-register-brand-decoration::after {
+  content: "";
+
+  position: absolute;
+  inset: 105px;
+
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
+}
+
+.nutritrace-register-basic-info {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 15px 20px;
+  width: 100%;
+}
+
+.nutritrace-register-field-full {
+  grid-column: 1 / -1;
+}
+
+.nutritrace-register-form-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80%;
+  min-height: 100vh;
+  background: var(--page-background);
+}
+
+.nutritrace-register-form-container {
+  width: 100%;
+  max-width: 880px;
+}
+
+.nutritrace-register-fields-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 33px;
+    width: 100%;
+}
+
+.nutritrace-register-form-header h2 {
+  margin-bottom: 13px;
+  color: var(--text-color);
+  font-size: 33px;
+  font-weight: 700;
+  letter-spacing: -0.8px;
+}
+
+.nutritrace-register-form-header p {
+  color: var(--muted-text);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.nutritrace-register-form-header-description{
+    margin-bottom: 11px;
+}
+
+.nutritrace-register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.nutritrace-register-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.nutritrace-register-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.nutritrace-register-input-icon {
+  position: absolute;
+  top: 50%;
+  left: 17px;
+
+  width: 21px;
+  height: 21px;
+
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.nutritrace-register-input-wrapper input {
+  width: 100%;
+  padding-left: 176px;
+}
+
+.nutritrace-register-select{
+width: 100%;
+  height: 44px;
+    padding: 0 50px;
+
+  border: 1px solid var(--border-color);
+
+  outline: none;
+  background: var(--input-background);
+
+  color: var(--text-color);
+  font-family: inherit;
+  font-size: 14px;
+
+  transition: 0.2s ease;
+}
+
+.nutritrace-register-field input {
+  width: 100%;
+  height: 44px;
+
+  padding: 0 50px;
+
+  border: 1px solid var(--border-color);
+
+  outline: none;
+  background: var(--input-background);
+
+  color: var(--text-color);
+  font-family: inherit;
+  font-size: 14px;
+
+  transition: 0.2s ease;
+}
+
+.nutritrace-register-field input::placeholder {
+  color: #a5b5b9;
+}
+
+.nutritrace-register-field input:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(61, 155, 69, 0.1);
+}
+
+
+/* Mot de passe */
+
+.nutritrace-register-password-wrapper {
+  position: relative;
+}
+
+.nutritrace-register-password-wrapper input {
+  padding-right: 88px;
+}
+
+.nutritrace-register-password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+
+  transform: translateY(-50%);
+
+  border: none;
+  background: transparent;
+
+  color: var(--green);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+
+/* Conditions */
+
+.nutritrace-register-terms {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 11px;
+  color: #789096;
+  font-size: 11px;
+  margin: 10px 0 0 0;
+  line-height: 1.6;
+  cursor: pointer;
+}
+
+.nutritrace-register-terms input {
+  width: 17px;
+  height: 17px;
+  margin-top: 2px;
+  accent-color: #05342d;
+  cursor: pointer;
+}
+
+.nutritrace-register-terms a {
+  color: #05342d;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.nutritrace-register-terms a:hover {
+  text-decoration: underline;
+}
+
+
+/* Bouton principal */
+
+.nutritrace-register-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 13px;
+  height: 44px;
+  margin-top: 6px;
+  border: none;
+  background: #05342d;
+  color: white;
+  font-family: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.2s ease;
+  margin: 0 140px;
+}
+
+.label{
+    font-size:11px
+}
+.nutritrace-register-submit span {
+  font-size: 21px;
+  line-height: 1;
+  transition: transform 0.2s ease;
+}
+
+
+
+/* Lien de connexion */
+
+.nutritrace-register-login-link {
+  margin-top: 10px;
+  color: #87999d;
+  font-size: 13px;
+  text-align: center;
+}
+
+.nutritrace-register-login-link a {
+  margin-left: 4px;
+  color: var(--green);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.nutritrace-register-login-link a:hover {
+  text-decoration: underline;
+}
+
+/* Login redirect section */
+.nutritrace-register-login {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #6b7c7d;
+    margin-top: 10px;
+}
+
+.nutritrace-register-login p {
+    margin: 0;
+}
+
+.nutritrace-register-login a {
+    color: #0b4145;
+    font-weight: 700;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+
+ /* text d'erreur */
+ .nutritrace-register-error {
+   display: block;
+   margin-top: 2px;
+   color: #c0392b;
+   font-size: 11px;
+ }
+
+/* Vérification de sécurité reCAPTCHA */
+.nutritrace-register-recaptcha {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.nutritrace-register-recaptcha label {
+  color: var(--text-color);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.nutritrace-register-recaptcha .g-recaptcha {
+  transform: scale(0.8);
+  transform-origin: center center;
+}
+
+

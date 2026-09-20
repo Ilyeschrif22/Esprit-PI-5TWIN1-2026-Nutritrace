@@ -24,11 +24,28 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        $gouvernorats = [
+            'Ariana', 'Béja', 'Ben Arous', 'Bizerte', 'Gabès', 'Gafsa',
+            'Jendouba', 'Kairouan', 'Kasserine', 'Kébili', 'Le Kef', 'Mahdia',
+            'La Manouba', 'Médenine', 'Monastir', 'Nabeul', 'Sfax', 'Sidi Bouzid',
+            'Siliana', 'Sousse', 'Tataouine', 'Tozeur', 'Tunis', 'Zaghouan',
+        ];
+
         return [
-            'name' => fake()->name(),
+            'name' => fake()->lastName(),
+            'prenom' => fake()->firstName(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
+            'cin' => fake()->unique()->numerify('########'),
+            'telephone' => '2'.fake()->numerify('#######'),
+            'date_naissance' => fake()->dateTimeBetween('-60 years', '-18 years')->format('Y-m-d'),
+            'genre' => fake()->randomElement(['homme', 'femme']),
+            'gouvernorat' => fake()->randomElement($gouvernorats),
+            'delegation' => fake()->city(),
+            'ville' => fake()->city(),
+            'adresse' => fake()->streetAddress(),
+            'code_postal' => fake()->numerify('####'),
             'remember_token' => Str::random(10),
         ];
     }
