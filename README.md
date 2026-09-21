@@ -42,3 +42,8 @@ L'application sera disponible à l'adresse locale affichée par Laravel. Pour la
 ```bash
 npm run dev
 ```
+
+## Architecture NutriTrace
+
+<img width="1555" height="1011" alt="9dd2b574-c565-4815-9fa8-46a424f9de57" src="https://github.com/user-attachments/assets/c7e8c94d-d79e-49d0-8ce0-775b62114cf3" />
+
