@@ -96,3 +96,28 @@
         </div>
     </div>
 </div>
+
+<script>
+    (function () {
+        // Only run if this is not the first load or if elements exist
+        var trigger = document.getElementById('profileTrigger');
+        var dropdown = document.getElementById('profileDropdown');
+
+        if (!trigger || !dropdown) return;
+
+        trigger.addEventListener('click', function (e) {
+            e.stopPropagation();
+            trigger.classList.toggle('open');
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!trigger.contains(e.target)) {
+                trigger.classList.remove('open');
+            }
+        });
+
+        dropdown.addEventListener('click', function (e) {
+            e.stopPropagation();
+        });
+    })();
+</script>
