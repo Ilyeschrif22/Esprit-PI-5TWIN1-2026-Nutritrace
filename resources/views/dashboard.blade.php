@@ -18,7 +18,7 @@
 <body>
 
     <!-- SideBar -->
-    @include('components.sidebar', ['active' => 'dashboard'])
+    @include('components.sidebar')
 
     <div class="nutritrace-main-container">
         <div class="nutritrace-navbar">

@@ -3,9 +3,19 @@
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\BatchesController;
+use App\Http\Controllers\CertificationsController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DocumentsController;
+use App\Http\Controllers\EnvironmentalImpactController;
+use App\Http\Controllers\MappingController;
 use App\Http\Controllers\PendingApprovalController;
+use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\RoleSelectionController;
+use App\Http\Controllers\StatsController;
+use App\Http\Controllers\TraceabilityController;
+use App\Http\Controllers\TransportController;
+use App\Http\Controllers\UtilisateursController;
 use App\Models\User;
 use App\Services\TwoFactorService;
 use Illuminate\Http\Request;
@@ -37,6 +47,16 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware('role.selected')->group(function () {
         Route::get('dashboard', DashboardController::class)->name('dashboard');
+        Route::get('products', ProductsController::class)->name('products');
+        Route::get('batches', BatchesController::class)->name('batches');
+        Route::get('utilisateurs', UtilisateursController::class)->name('utilisateurs');
+        Route::get('traceability', TraceabilityController::class)->name('traceability');
+        Route::get('transport', TransportController::class)->name('transport');
+        Route::get('certifications', CertificationsController::class)->name('certifications');
+        Route::get('documents', DocumentsController::class)->name('documents');
+        Route::get('env-impact', EnvironmentalImpactController::class)->name('env-impact');
+        Route::get('mapping', MappingController::class)->name('mapping');
+        Route::get('stats', StatsController::class)->name('stats');
     });
 
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
