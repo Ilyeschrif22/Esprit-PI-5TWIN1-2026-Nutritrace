@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PendingApprovalController;
 use App\Http\Controllers\RoleSelectionController;
+use App\Http\Controllers\Traceability\TraceabilityController;
 use App\Models\User;
 use App\Services\TwoFactorService;
 use Illuminate\Http\Request;
@@ -30,14 +31,19 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
-    Route::get('role-selection', [RoleSelectionController::class, 'create'])->name('role-selection.create');
-    Route::post('role-selection', [RoleSelectionController::class, 'store'])->name('role-selection.store');
+    Route::get('/dashboard', DashboardController::class)->name('dashboard');
 
-    Route::get('pending-approval', PendingApprovalController::class)->name('pending-approval');
+    Route::get('/role-selection', [RoleSelectionController::class, 'create'])->name('role-selection.create');
+    Route::post('/role-selection', [RoleSelectionController::class, 'store'])->name('role-selection.store');
 
-    Route::middleware('role.selected')->group(function () {
-        Route::get('dashboard', DashboardController::class)->name('dashboard');
-    });
+    Route::get('/traceability', [TraceabilityController::class, 'index'])->name('traceability.index');
+    Route::get('/traceability/dashboard', [TraceabilityController::class, 'dashboard'])->name('traceability.dashboard');
+    Route::get('/traceability/lots/{lot}', [TraceabilityController::class, 'show'])->name('traceability.show');
+    Route::get('/traceability/lots/{lot}/timeline', [TraceabilityController::class, 'timeline'])->name('traceability.timeline');
+    Route::get('/traceability/lots/{lot}/upstream', [TraceabilityController::class, 'upstream'])->name('traceability.upstream');
+    Route::get('/traceability/lots/{lot}/downstream', [TraceabilityController::class, 'downstream'])->name('traceability.downstream');
+    Route::get('/traceability/lots/{lot}/alerts', [TraceabilityController::class, 'alerts'])->name('traceability.alerts');
+    Route::post('/traceability/production', [TraceabilityController::class, 'storeProduction'])->name('traceability.production.store');
 
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 });

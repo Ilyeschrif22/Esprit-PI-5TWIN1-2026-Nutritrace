@@ -32,20 +32,16 @@ class UserFactory extends Factory
         ];
 
         return [
-            'name' => fake()->lastName(),
-            'prenom' => fake()->firstName(),
+            'fullname' => fake()->firstName().' '.fake()->lastName(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'cin' => fake()->unique()->numerify('########'),
-            'telephone' => '2'.fake()->numerify('#######'),
-            'date_naissance' => fake()->dateTimeBetween('-60 years', '-18 years')->format('Y-m-d'),
-            'genre' => fake()->randomElement(['homme', 'femme']),
-            'gouvernorat' => fake()->randomElement($gouvernorats),
-            'delegation' => fake()->city(),
-            'ville' => fake()->city(),
-            'adresse' => fake()->streetAddress(),
-            'code_postal' => fake()->numerify('####'),
+            'phone' => '2'.fake()->numerify('#######'),
+            'birthdate' => fake()->dateTimeBetween('-60 years', '-18 years')->format('Y-m-d'),
+            'governorate' => fake()->randomElement($gouvernorats),
+            'city' => fake()->city(),
+            'address' => fake()->streetAddress(),
             'remember_token' => Str::random(10),
         ];
     }

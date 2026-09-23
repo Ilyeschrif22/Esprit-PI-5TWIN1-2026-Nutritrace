@@ -685,17 +685,11 @@
     })();
 
     document.addEventListener("DOMContentLoaded", function () {
-
-        const locations = [
-            [36.8065, 10.1815],
-            [36.8180, 10.1658],
-            [36.8320, 10.1850],
-            [36.8450, 10.1950]
-        ];
+        const lotMarkers = @json($lots ?? []);
 
         const map = L.map("traceability-map", {
             zoomControl: true
-        }).setView([36.825, 10.18], 12);
+        }).setView([36.825, 10.18], 7);
 
         L.tileLayer(
             "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -706,87 +700,55 @@
             }
         ).addTo(map);
 
-        // Custom green pointer
-        const greenIcon = L.divIcon({
-            className: "custom-map-marker",
-            html: `
-                <div style="
-                    width: 32px;
-                    height: 32px;
-                    background: #2e7d32;
-                    border: 3px solid white;
-                    border-radius: 50% 50% 50% 0;
-                    transform: rotate(-45deg);
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                ">
-                    <span style="
-                        transform: rotate(45deg);
-                        color: white;
-                        font-weight: 700;
-                        font-size: 13px;
-                    "></span>
-                </div>
-            `,
-            iconSize: [32, 32],
-            iconAnchor: [16, 32],
-            popupAnchor: [0, -32]
-        });
+        const pathPoints = [];
 
-        // Add 4 markers
-        locations.forEach((location, index) => {
-
-            const icon = L.divIcon({
-                className: "custom-map-marker",
-                html: `
-                    <div style="
-                        width: 32px;
-                        height: 32px;
-                        background: #2e7d32;
-                        border: 3px solid white;
-                        border-radius: 50% 50% 50% 0;
-                        transform: rotate(-45deg);
-                        box-shadow: 0 2px 8px rgba(0,0,0,0.25);
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                    ">
-                        <span style="
-                            transform: rotate(45deg);
+        lotMarkers.forEach((lot, index) => {
+            const marker = L.marker([lot.lat, lot.lng], {
+                icon: L.divIcon({
+                    className: "custom-map-marker",
+                    html: `
+                        <div style="
+                            width: 30px;
+                            height: 30px;
+                            line-height: 30px;
+                            text-align: center;
+                            background: #2e7d32;
+                            border: 3px solid white;
+                            border-radius: 50%;
                             color: white;
                             font-weight: 700;
-                            font-size: 13px;
-                        ">${index + 1}</span>
-                    </div>
-                `,
-                iconSize: [32, 32],
-                iconAnchor: [16, 32]
-            });
+                            font-size: 11px;
+                            box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+                        ">${index + 1}</div>
+                    `,
+                    iconSize: [30, 30],
+                    iconAnchor: [15, 30],
+                    popupAnchor: [0, -24]
+                })
+            }).addTo(map);
 
-            L.marker(location, {
-                icon: icon
-            })
-            .addTo(map)
-            .bindPopup(`
-                <strong>Lot ${index + 1}</strong><br>
-                Point de traçabilité ${index + 1}
+            marker.bindPopup(`
+                <strong>${lot.lot_number}</strong><br>
+                ${lot.product_name}<br>
+                <span>${lot.origin}</span>
             `);
+
+            pathPoints.push([lot.lat, lot.lng]);
         });
 
-        // Connect the 4 points
-        L.polyline(locations, {
-            color: "#2e7d32",
-            weight: 4,
-            opacity: 0.85
-        }).addTo(map);
+        if (pathPoints.length > 1) {
+            L.polyline(pathPoints, {
+                color: "#2e7d32",
+                weight: 4,
+                opacity: 0.8
+            }).addTo(map);
+        }
 
-        // Fit map to all markers
-        map.fitBounds(locations, {
-            padding: [40, 40]
-        });
-
+        if (pathPoints.length > 0) {
+            map.fitBounds(pathPoints, {
+                padding: [40, 40]
+            });
+        }
     });
 </script>
 </body>
