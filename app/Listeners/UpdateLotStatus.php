@@ -15,6 +15,13 @@ class UpdateLotStatus
         if ($event->traceEvent->stage === TraceStage::PRODUCTION) {
             $lot->status = LotStatus::ACTIVE;
             $lot->save();
+
+            return;
+        }
+
+        if ($event->traceEvent->stage === TraceStage::TRANSPORT) {
+            $lot->status = LotStatus::IN_TRANSIT;
+            $lot->save();
         }
     }
 }

@@ -7,7 +7,6 @@ enum LotStatus: string
     case ACTIVE = 'active';
     case IN_TRANSIT = 'in_transit';
     case STORED = 'stored';
-    case TRANSFORMED = 'transformed';
     case SOLD = 'sold';
     case BLOCKED = 'blocked';
     case RECALLED = 'recalled';

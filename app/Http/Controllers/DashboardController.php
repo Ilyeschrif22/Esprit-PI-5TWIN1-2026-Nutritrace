@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\LotStatus;
+use App\Enums\TraceStage;
 use App\Models\Lot;
 use App\Services\JwtService;
 use Illuminate\View\View;
@@ -20,6 +22,13 @@ class DashboardController extends Controller
         $apiToken = $jwtService->generateToken($user);
 
         $lots = Lot::with('product')->latest()->limit(12)->get()->map(function (Lot $lot) {
+            $lastEvent = $lot->events()->latest('occurred_at')->first();
+            $stage = $lastEvent?->stage?->value ?? match ($lot->status) {
+                LotStatus::IN_TRANSIT => TraceStage::TRANSPORT->value,
+                LotStatus::ACTIVE => TraceStage::PRODUCTION->value,
+                default => 'default',
+            };
+
             $origin = strtolower((string) ($lot->origin ?: $lot->location ?: 'Tunisie'));
 
             $productionPoints = [
@@ -34,9 +43,12 @@ class DashboardController extends Controller
             $coords = $productionPoints[$origin] ?? [36.8065, 10.1815];
 
             return [
+                'id' => $lot->id,
                 'lot_number' => $lot->lot_number,
                 'product_name' => $lot->product?->name ?? 'Produit',
                 'origin' => $lot->origin ?: $lot->location ?: 'Tunisie',
+                'stage' => $stage,
+                'status' => $lot->status?->value,
                 'lat' => $coords[0],
                 'lng' => $coords[1],
             ];

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Traceability;
 
 use App\Actions\CreateProductionTrace;
+use App\Enums\LotStatus;
+use App\Enums\TraceStage;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Traceability\StoreProductionTraceRequest;
 use App\Models\Lot;
@@ -60,24 +62,6 @@ class TraceabilityController extends Controller
         ]);
     }
 
-    public function publicTrace(string $token)
-    {
-        $data = $this->traceabilityService->getPublicTrace($token);
-
-        return response()->json([
-            'success' => true,
-            'data' => $data,
-        ]);
-    }
-
-    public function map(Lot $lot)
-    {
-        return response()->json([
-            'success' => true,
-            'data' => $this->traceabilityService->getLotMap($lot),
-        ]);
-    }
-
     public function storeProduction(StoreProductionTraceRequest $request, CreateProductionTrace $action)
     {
         $lot = $action->handle($request->validated(), Auth::user());
@@ -89,82 +73,24 @@ class TraceabilityController extends Controller
         ]);
     }
 
-    public function storeTransformation(Request $request)
-    {
-        $validated = $request->validate([
-            'input_lot_id' => 'required|exists:lots,id',
-            'process_name' => 'sometimes|string|max:255',
-            'output_quantity' => 'required|numeric|min:0',
-            'loss_quantity' => 'nullable|numeric|min:0',
-            'location_id' => 'nullable|exists:locations,id',
-            'occurred_at' => 'nullable|date',
-            'notes' => 'nullable|string',
-        ]);
-
-        $transformation = $this->traceabilityService->createTransformation($validated, Auth::user());
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Transformation enregistrée.',
-            'transformation' => $transformation,
-        ]);
-    }
-
-    public function storeColdChain(Request $request)
-    {
-        $validated = $request->validate([
-            'lot_id' => 'required|exists:lots,id',
-            'location_id' => 'nullable|exists:locations,id',
-            'action' => 'required|string|max:255',
-            'temperature_c' => 'nullable|numeric',
-            'occurred_at' => 'nullable|date',
-            'notes' => 'nullable|string',
-        ]);
-
-        $log = $this->traceabilityService->createColdChainLog($validated, Auth::user());
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Événement de chaîne du froid enregistré.',
-            'event' => $log,
-        ]);
-    }
-
-    public function storeShipment(Request $request)
-    {
-        $validated = $request->validate([
-            'lot_id' => 'required|exists:lots,id',
-            'reference' => 'sometimes|string|max:255',
-            'origin_location_id' => 'required|exists:locations,id',
-            'destination_location_id' => 'required|exists:locations,id',
-            'transport_mode' => 'required|string',
-            'carrier' => 'nullable|string|max:255',
-            'vehicle_reference' => 'nullable|string|max:255',
-            'distance_km' => 'nullable|numeric|min:0',
-            'departed_at' => 'nullable|date',
-            'expected_arrival_at' => 'nullable|date|after_or_equal:departed_at',
-        ]);
-
-        $shipment = $this->traceabilityService->createShipment($validated, Auth::user());
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Expédition enregistrée.',
-            'shipment' => $shipment->load(['lot', 'origin', 'destination']),
-        ]);
-    }
-
     public function dashboard()
     {
         $stats = [
             'total_lots' => Lot::count(),
-            'active_lots' => Lot::where('status', 'active')->count(),
-            'blocked_lots' => Lot::where('status', 'blocked')->count(),
+            'active_lots' => Lot::where('status', LotStatus::ACTIVE->value)->count(),
+            'in_transit_lots' => Lot::where('status', LotStatus::IN_TRANSIT->value)->count(),
+            'blocked_lots' => Lot::where('status', LotStatus::BLOCKED->value)->count(),
         ];
 
         $lots = Lot::with('product')->latest()->limit(12)->get()->map(function (Lot $lot) {
-            $origin = strtolower((string) ($lot->origin ?: $lot->location ?: 'Tunisie'));
+            $lastEvent = $lot->events()->latest('occurred_at')->first();
+            $stage = $lastEvent?->stage?->value ?? match ($lot->status) {
+                LotStatus::IN_TRANSIT => TraceStage::TRANSPORT->value,
+                LotStatus::ACTIVE => TraceStage::PRODUCTION->value,
+                default => 'default',
+            };
 
+            $origin = strtolower((string) ($lot->origin ?: $lot->location ?: 'Tunisie'));
             $productionPoints = [
                 'nabeul' => [36.4511, 10.7322],
                 'sfax' => [34.7406, 10.7604],
@@ -177,14 +103,36 @@ class TraceabilityController extends Controller
             $coords = $productionPoints[$origin] ?? [36.8065, 10.1815];
 
             return [
+                'id' => $lot->id,
                 'lot_number' => $lot->lot_number,
                 'product_name' => $lot->product?->name ?? 'Produit',
                 'origin' => $lot->origin ?: $lot->location ?: 'Tunisie',
+                'stage' => $stage,
+                'status' => $lot->status?->value,
                 'lat' => $coords[0],
                 'lng' => $coords[1],
             ];
         });
 
         return view('traceability.dashboard', compact('stats', 'lots'));
+    }
+
+    public function storeTransit(Lot $lot, Request $request)
+    {
+        $request->validate([
+            'transport_mode' => ['nullable', 'string', 'max:50'],
+            'carrier' => ['nullable', 'string', 'max:255'],
+            'origin' => ['nullable', 'string', 'max:255'],
+            'destination' => ['nullable', 'string', 'max:255'],
+            'departed_at' => ['nullable', 'date'],
+        ]);
+
+        $updatedLot = $this->traceabilityService->recordTransit($lot, $request->all(), Auth::user());
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Lot mis en transit.',
+            'lot' => $updatedLot,
+        ]);
     }
 }
