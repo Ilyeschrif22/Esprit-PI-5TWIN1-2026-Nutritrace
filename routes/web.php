@@ -43,11 +43,16 @@ Route::middleware('auth')->group(function () {
     Route::get('/traceability/lots/{lot}/upstream', [TraceabilityController::class, 'upstream'])->name('traceability.upstream');
     Route::get('/traceability/lots/{lot}/downstream', [TraceabilityController::class, 'downstream'])->name('traceability.downstream');
     Route::get('/traceability/lots/{lot}/alerts', [TraceabilityController::class, 'alerts'])->name('traceability.alerts');
+    Route::get('/traceability/lots/{lot}/map', [TraceabilityController::class, 'map'])->name('traceability.map');
     Route::post('/traceability/production', [TraceabilityController::class, 'storeProduction'])->name('traceability.production.store');
+    Route::post('/traceability/transformations', [TraceabilityController::class, 'storeTransformation'])->name('traceability.transformations.store');
+    Route::post('/traceability/cold-chain', [TraceabilityController::class, 'storeColdChain'])->name('traceability.coldchain.store');
+    Route::post('/traceability/shipments', [TraceabilityController::class, 'storeShipment'])->name('traceability.shipments.store');
 
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 });
 
+Route::get('/trace/{token}', [TraceabilityController::class, 'publicTrace'])->name('traceability.public');
 
 /** 2fa routes (guest — user isn't fully authenticated yet at this point) */
 Route::middleware('guest')->group(function () {

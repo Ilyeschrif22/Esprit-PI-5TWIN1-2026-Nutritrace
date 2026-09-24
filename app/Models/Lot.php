@@ -44,6 +44,26 @@ class Lot extends Model
         return $this->hasMany(TraceAlert::class)->orderBy('detected_at');
     }
 
+    public function shipments(): HasMany
+    {
+        return $this->hasMany(Shipment::class)->orderBy('departed_at');
+    }
+
+    public function transformations(): HasMany
+    {
+        return $this->hasMany(Transformation::class, 'input_lot_id')->orderBy('occurred_at');
+    }
+
+    public function outputTransformations(): HasMany
+    {
+        return $this->hasMany(Transformation::class, 'output_lot_id')->orderBy('occurred_at');
+    }
+
+    public function coldChainLogs(): HasMany
+    {
+        return $this->hasMany(ColdChainLog::class)->orderBy('occurred_at');
+    }
+
     public function auditLogs(): HasMany
     {
         return $this->hasMany(AuditLog::class, 'entity_id')->where('entity_type', self::class);

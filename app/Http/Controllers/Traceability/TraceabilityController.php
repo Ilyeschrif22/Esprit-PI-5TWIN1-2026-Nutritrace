@@ -60,6 +60,24 @@ class TraceabilityController extends Controller
         ]);
     }
 
+    public function publicTrace(string $token)
+    {
+        $data = $this->traceabilityService->getPublicTrace($token);
+
+        return response()->json([
+            'success' => true,
+            'data' => $data,
+        ]);
+    }
+
+    public function map(Lot $lot)
+    {
+        return response()->json([
+            'success' => true,
+            'data' => $this->traceabilityService->getLotMap($lot),
+        ]);
+    }
+
     public function storeProduction(StoreProductionTraceRequest $request, CreateProductionTrace $action)
     {
         $lot = $action->handle($request->validated(), Auth::user());
@@ -68,6 +86,71 @@ class TraceabilityController extends Controller
             'success' => true,
             'message' => 'Production enregistrée.',
             'lot' => $lot,
+        ]);
+    }
+
+    public function storeTransformation(Request $request)
+    {
+        $validated = $request->validate([
+            'input_lot_id' => 'required|exists:lots,id',
+            'process_name' => 'sometimes|string|max:255',
+            'output_quantity' => 'required|numeric|min:0',
+            'loss_quantity' => 'nullable|numeric|min:0',
+            'location_id' => 'nullable|exists:locations,id',
+            'occurred_at' => 'nullable|date',
+            'notes' => 'nullable|string',
+        ]);
+
+        $transformation = $this->traceabilityService->createTransformation($validated, Auth::user());
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Transformation enregistrée.',
+            'transformation' => $transformation,
+        ]);
+    }
+
+    public function storeColdChain(Request $request)
+    {
+        $validated = $request->validate([
+            'lot_id' => 'required|exists:lots,id',
+            'location_id' => 'nullable|exists:locations,id',
+            'action' => 'required|string|max:255',
+            'temperature_c' => 'nullable|numeric',
+            'occurred_at' => 'nullable|date',
+            'notes' => 'nullable|string',
+        ]);
+
+        $log = $this->traceabilityService->createColdChainLog($validated, Auth::user());
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Événement de chaîne du froid enregistré.',
+            'event' => $log,
+        ]);
+    }
+
+    public function storeShipment(Request $request)
+    {
+        $validated = $request->validate([
+            'lot_id' => 'required|exists:lots,id',
+            'reference' => 'sometimes|string|max:255',
+            'origin_location_id' => 'required|exists:locations,id',
+            'destination_location_id' => 'required|exists:locations,id',
+            'transport_mode' => 'required|string',
+            'carrier' => 'nullable|string|max:255',
+            'vehicle_reference' => 'nullable|string|max:255',
+            'distance_km' => 'nullable|numeric|min:0',
+            'departed_at' => 'nullable|date',
+            'expected_arrival_at' => 'nullable|date|after_or_equal:departed_at',
+        ]);
+
+        $shipment = $this->traceabilityService->createShipment($validated, Auth::user());
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Expédition enregistrée.',
+            'shipment' => $shipment->load(['lot', 'origin', 'destination']),
         ]);
     }
 

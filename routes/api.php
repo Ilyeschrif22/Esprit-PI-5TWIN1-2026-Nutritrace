@@ -18,5 +18,10 @@ Route::middleware('jwt.auth')->group(function () {
     Route::get('/traceability/lots/{lot}/upstream', [TraceabilityController::class, 'upstream']);
     Route::get('/traceability/lots/{lot}/downstream', [TraceabilityController::class, 'downstream']);
     Route::get('/traceability/lots/{lot}/alerts', [TraceabilityController::class, 'alerts']);
+    Route::get('/traceability/lots/{lot}/map', [TraceabilityController::class, 'map']);
     Route::post('/traceability/production', [TraceabilityController::class, 'storeProduction']);
+    Route::post('/traceability/transformations', [TraceabilityController::class, 'storeTransformation']);
+    Route::post('/traceability/cold-chain', [TraceabilityController::class, 'storeColdChain']);
+    Route::post('/v1/shipments', [TraceabilityController::class, 'storeShipment']);
+    Route::get('/public/traceability/{token}', [TraceabilityController::class, 'publicTrace']);
 });
