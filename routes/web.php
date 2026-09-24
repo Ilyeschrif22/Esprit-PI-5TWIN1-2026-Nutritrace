@@ -22,9 +22,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
+/** redirect to landing page */
 Route::get('/', function () {
-    return view('welcome');
+    return view('pages.landing');
 });
+
 
 Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])->name('register');
