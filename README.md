@@ -1,3 +1,6 @@
+
+<img width="1890" height="902" alt="image" src="https://github.com/user-attachments/assets/9bc2e781-76d8-45b4-a763-0e2fb6914a93" />
+
 <img width="1910" height="907" alt="image" src="https://github.com/user-attachments/assets/291fd5f5-8b6e-4f10-b34c-9f8f0077edd3" />
 
 # NutriTrace
