@@ -49,6 +49,13 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware('role.selected')->group(function () {
         Route::get('dashboard', DashboardController::class)->name('dashboard');
+        /**profile route */
+        Route::get('profile', function () {
+            $user = auth()->user()->load('roles');
+
+            return view('pages.profile', compact('user'));
+        })->name('profile');
+
         Route::get('products', ProductsController::class)->name('products');
         Route::get('batches', BatchesController::class)->name('batches');
         Route::get('utilisateurs', UtilisateursController::class)->name('utilisateurs');

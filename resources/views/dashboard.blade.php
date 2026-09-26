@@ -78,6 +78,7 @@
                         <div class="profile-dropdown-avatar">
                             <img src="{{ asset('images/avatar.png') }}" class="avatar-image" alt="Photo de profil">
                         </div>
+
                         <div class="profile-dropdown-header-info">
                             <span class="dropdown-name">{{ $user->fullname }}</span>
                             <span class="dropdown-email">{{ $user->email }}</span>
@@ -95,7 +96,7 @@
                                 <circle cx="12" cy="8" r="5" />
                                 <path d="M20 21a8 8 0 0 0-16 0" />
                             </svg>
-                            Voir le profil
+                            <a href="{{ route('profile') }}">Voir profile</a>
                         </li>
 
                         <li class="profile-dropdown-item">

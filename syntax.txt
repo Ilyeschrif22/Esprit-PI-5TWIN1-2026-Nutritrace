@@ -1,0 +1,5 @@
+#image
+<img src="{{ asset('images/profile.jpg') }}" alt="Profile">
+
+#object attribute
+{{ $user->fullname }}
