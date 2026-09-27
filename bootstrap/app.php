@@ -18,7 +18,9 @@ return Application::configure(basePath: dirname(__DIR__))
         
         $middleware->alias([
             'role.selected' => \App\Http\Middleware\EnsureRoleSelected::class,
+            'account.active' => \App\Http\Middleware\EnsureAccountIsActive::class,
             'jwt.auth' => \App\Http\Middleware\JwtAuth::class,
+            'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

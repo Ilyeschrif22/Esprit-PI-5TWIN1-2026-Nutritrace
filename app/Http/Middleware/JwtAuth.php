@@ -40,6 +40,12 @@ class JwtAuth
             ], 401);
         }
 
+        if (! $user->is_active) {
+            return response()->json([
+                'message' => 'This account is disabled.',
+            ], 403);
+        }
+
         // Authenticate the user for this request
         Auth::setUser($user);
 

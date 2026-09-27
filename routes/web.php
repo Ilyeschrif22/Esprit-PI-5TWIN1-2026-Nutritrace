@@ -41,7 +41,7 @@ Route::middleware('guest')->group(function () {
     Route::post('reset-password', [PasswordResetLinkController::class, 'update'])->name('password.update');
 });
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'account.active'])->group(function () {
     Route::get('role-selection', [RoleSelectionController::class, 'create'])->name('role-selection.create');
     Route::post('role-selection', [RoleSelectionController::class, 'store'])->name('role-selection.store');
 
@@ -58,7 +58,14 @@ Route::middleware('auth')->group(function () {
 
         Route::get('products', ProductsController::class)->name('products');
         Route::get('batches', BatchesController::class)->name('batches');
-        Route::get('utilisateurs', UtilisateursController::class)->name('utilisateurs');
+        Route::get('utilisateurs', [UtilisateursController::class, 'index'])->name('utilisateurs');
+        Route::get('utilisateurs/create', [UtilisateursController::class, 'create'])->name('utilisateurs.create');
+        Route::post('utilisateurs', [UtilisateursController::class, 'store'])->name('utilisateurs.store');
+        Route::get('utilisateurs/{utilisateur}', [UtilisateursController::class, 'show'])->name('utilisateurs.show');
+        Route::get('utilisateurs/{utilisateur}/edit', [UtilisateursController::class, 'edit'])->name('utilisateurs.edit');
+        Route::put('utilisateurs/{utilisateur}', [UtilisateursController::class, 'update'])->name('utilisateurs.update');
+        Route::patch('utilisateurs/{utilisateur}/status', [UtilisateursController::class, 'toggleStatus'])->name('utilisateurs.status');
+        Route::delete('utilisateurs/{utilisateur}', [UtilisateursController::class, 'destroy'])->name('utilisateurs.destroy');
         Route::get('traceability', TraceabilityController::class)->name('traceability');
         Route::get('transport', TransportController::class)->name('transport');
         Route::get('certifications', CertificationsController::class)->name('certifications');
@@ -97,6 +104,14 @@ Route::middleware('guest')->group(function () {
             return redirect()->route('login');
         }
 
+        if (! $user->is_active) {
+            session()->forget(['2fa_user_id', '2fa_remember']);
+
+            return redirect()->route('login')->withErrors([
+                'email' => 'Ce compte est désactivé. Contactez un administrateur.',
+            ]);
+        }
+
         if (! $twoFactor->verify($request->code)) {
             return back()->withErrors(['code' => 'Code invalide ou expiré.']);
         }
@@ -113,7 +128,7 @@ Route::middleware('guest')->group(function () {
         $request->session()->regenerate();
 
         // Check if user already has a role (existing user)
-        if ($user->hasAnyRole(['producteur', 'transformateur', 'distributeur', 'consommateur'])) {
+        if ($user->hasAnyRole(['admin', 'producteur', 'transformateur', 'distributeur', 'consommateur'])) {
             return redirect()->intended(route('dashboard'));
         }
 

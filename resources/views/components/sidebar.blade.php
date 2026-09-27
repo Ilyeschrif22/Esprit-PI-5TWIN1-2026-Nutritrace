@@ -164,7 +164,9 @@
             // Get the current route name from the URL
             const currentPath = window.location.pathname;
             const pathParts = currentPath.split('/');
-            const currentRoute = pathParts[pathParts.length - 1] || 'dashboard';
+            const currentRoute = pathParts.includes('utilisateurs')
+                ? 'utilisateurs'
+                : pathParts[pathParts.length - 1] || 'dashboard';
 
             // Remove active class from all sidebar items
             document.querySelectorAll('.sidebar-list li').forEach(item => {

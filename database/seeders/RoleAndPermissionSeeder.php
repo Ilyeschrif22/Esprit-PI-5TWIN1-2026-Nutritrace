@@ -54,6 +54,8 @@ class RoleAndPermissionSeeder extends Seeder
             Permission::firstOrCreate(['name' => $permission]);
         }
 
+        Role::firstOrCreate(['name' => 'admin']);
+
         $producteur = Role::firstOrCreate(['name' => 'producteur']);
         $producteur->syncPermissions([
             'produit.create',

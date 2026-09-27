@@ -16,7 +16,7 @@ class EnsureRoleSelected
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check() && !Auth::user()->hasAnyRole(['producteur', 'transformateur', 'distributeur', 'consommateur'])) {
+        if (Auth::check() && !Auth::user()->hasAnyRole(['admin', 'producteur', 'transformateur', 'distributeur', 'consommateur'])) {
             if (!$request->routeIs('role-selection.*')) {
                 return redirect()->route('role-selection.create');
             }

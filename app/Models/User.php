@@ -21,6 +21,7 @@ use Spatie\Permission\Traits\HasRoles;
     'governorate',
     'city',
     'address',
+    'is_active',
 ])]
 
 
@@ -47,6 +48,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'birthdate' => 'date',
+            'is_active' => 'boolean',
         ];
     }
 }

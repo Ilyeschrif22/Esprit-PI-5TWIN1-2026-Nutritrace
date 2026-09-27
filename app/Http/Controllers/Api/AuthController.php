@@ -36,6 +36,12 @@ class AuthController extends Controller
 
         $user = \App\Models\User::where('email', $credentials['email'])->first();
 
+        if (! $user->is_active) {
+            return response()->json([
+                'message' => 'This account is disabled.',
+            ], 403);
+        }
+
         // Check if email is verified
         if (is_null($user->email_verified_at)) {
             return response()->json([

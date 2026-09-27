@@ -37,6 +37,12 @@ class AuthenticatedSessionController extends Controller
 
         $user = \App\Models\User::where('email', $credentials['email'])->first();
 
+        if (! $user->is_active) {
+            throw ValidationException::withMessages([
+                'email' => 'Ce compte est désactivé. Contactez un administrateur.',
+            ]);
+        }
+
         // Not verified yet — send them through the 2FA / email-verification flow.
         if (is_null($user->email_verified_at)) {
             $request->session()->put('2fa_user_id', $user->id);
@@ -50,7 +56,7 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerate();
 
         // Check if user already has a role (existing user)
-        if ($user->hasAnyRole(['producteur', 'transformateur', 'distributeur', 'consommateur'])) {
+        if ($user->hasAnyRole(['admin', 'producteur', 'transformateur', 'distributeur', 'consommateur'])) {
             return redirect()->intended(route('dashboard'));
         }
 
