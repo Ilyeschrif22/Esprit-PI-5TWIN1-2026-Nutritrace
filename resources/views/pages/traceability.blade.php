@@ -292,18 +292,14 @@
                 <article class="trace-panel map-panel">
                     <div class="map-panel-header">
                         <div class="map-title-area">
+                            
                             <div class="map-title-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></div>
                             <div>
                                 <h2>Carte de traçabilité territoriale</h2>
                                 <p>Parcours géographique des événements enregistrés</p>
                             </div>
                         </div>
-                        <div class="map-controls">
-                            <button class="map-control active" type="button" data-map-filter="all">Tout</button>
-                            <button class="map-control" type="button" data-map-filter="production">Production</button>
-                            <button class="map-control" type="button" data-map-filter="transport">Transport</button>
-                            <button class="map-control" type="button" data-map-filter="distribution">Distribution</button>
-                        </div>
+
                     </div>
                     <div class="map-container">
                         <div id="traceability-map"></div>

@@ -69,7 +69,7 @@ Route::middleware('auth')->group(function () {
         Route::get('products', ProductsController::class)->name('products');
         Route::get('batches', BatchesController::class)->name('batches');
         Route::get('utilisateurs', UtilisateursController::class)->name('utilisateurs');
-
+        Route::get('traceability', TraceabilityController::class)->name('traceability');
         Route::get('transport', TransportController::class)->name('transport');
         Route::get('certifications', CertificationsController::class)->name('certifications');
         Route::get('documents', DocumentsController::class)->name('documents');
