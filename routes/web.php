@@ -3,19 +3,30 @@
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\BatchesController;
+use App\Http\Controllers\CertificationsController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DocumentsController;
+use App\Http\Controllers\EnvironmentalImpactController;
+use App\Http\Controllers\MappingController;
 use App\Http\Controllers\PendingApprovalController;
+use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\RoleSelectionController;
-use App\Http\Controllers\Traceability\TraceabilityController;
+use App\Http\Controllers\TraceabilityController;
+use App\Http\Controllers\StatsController;
+use App\Http\Controllers\TransportController;
+use App\Http\Controllers\UtilisateursController;
 use App\Models\User;
 use App\Services\TwoFactorService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
+/** redirect to landing page */
 Route::get('/', function () {
-    return view('welcome');
+    return view('pages.landing');
 });
+
 
 Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])->name('register');
@@ -31,20 +42,41 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
-    Route::get('/dashboard', DashboardController::class)->name('dashboard');
+    Route::get('role-selection', [RoleSelectionController::class, 'create'])->name('role-selection.create');
+    Route::post('role-selection', [RoleSelectionController::class, 'store'])->name('role-selection.store');
 
-    Route::get('/role-selection', [RoleSelectionController::class, 'create'])->name('role-selection.create');
-    Route::post('/role-selection', [RoleSelectionController::class, 'store'])->name('role-selection.store');
+    Route::get('pending-approval', PendingApprovalController::class)->name('pending-approval');
 
-    Route::get('/traceability', [TraceabilityController::class, 'index'])->name('traceability.index');
-    Route::get('/traceability/dashboard', [TraceabilityController::class, 'dashboard'])->name('traceability.dashboard');
-    Route::get('/traceability/lots/{lot}', [TraceabilityController::class, 'show'])->name('traceability.show');
-    Route::get('/traceability/lots/{lot}/timeline', [TraceabilityController::class, 'timeline'])->name('traceability.timeline');
-    Route::get('/traceability/lots/{lot}/upstream', [TraceabilityController::class, 'upstream'])->name('traceability.upstream');
-    Route::get('/traceability/lots/{lot}/downstream', [TraceabilityController::class, 'downstream'])->name('traceability.downstream');
-    Route::get('/traceability/lots/{lot}/alerts', [TraceabilityController::class, 'alerts'])->name('traceability.alerts');
-    Route::post('/traceability/production', [TraceabilityController::class, 'storeProduction'])->name('traceability.production.store');
-    Route::post('/traceability/lots/{lot}/transit', [TraceabilityController::class, 'storeTransit'])->name('traceability.lots.transit');
+    Route::get('traceability', [TraceabilityController::class, 'index'])->name('traceability');
+    Route::get('traceability/dashboard', [TraceabilityController::class, 'dashboard'])->name('traceability.dashboard');
+    Route::get('traceability/lots/{lot}', [TraceabilityController::class, 'show'])->name('traceability.show');
+    Route::get('traceability/lots/{lot}/timeline', [TraceabilityController::class, 'timeline'])->name('traceability.timeline');
+    Route::get('traceability/lots/{lot}/upstream', [TraceabilityController::class, 'upstream'])->name('traceability.upstream');
+    Route::get('traceability/lots/{lot}/downstream', [TraceabilityController::class, 'downstream'])->name('traceability.downstream');
+    Route::get('traceability/lots/{lot}/alerts', [TraceabilityController::class, 'alerts'])->name('traceability.alerts');
+    Route::post('traceability/production', [TraceabilityController::class, 'storeProduction'])->name('traceability.production.store');
+    Route::post('traceability/lots/{lot}/transit', [TraceabilityController::class, 'storeTransit'])->name('traceability.lots.transit');
+
+    Route::middleware('role.selected')->group(function () {
+        Route::get('dashboard', DashboardController::class)->name('dashboard');
+        /**profile route */
+        Route::get('profile', function () {
+            $user = auth()->user()->load('roles');
+
+            return view('pages.profile', compact('user'));
+        })->name('profile');
+
+        Route::get('products', ProductsController::class)->name('products');
+        Route::get('batches', BatchesController::class)->name('batches');
+        Route::get('utilisateurs', UtilisateursController::class)->name('utilisateurs');
+
+        Route::get('transport', TransportController::class)->name('transport');
+        Route::get('certifications', CertificationsController::class)->name('certifications');
+        Route::get('documents', DocumentsController::class)->name('documents');
+        Route::get('env-impact', EnvironmentalImpactController::class)->name('env-impact');
+        Route::get('mapping', MappingController::class)->name('mapping');
+        Route::get('stats', StatsController::class)->name('stats');
+    });
 
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 });

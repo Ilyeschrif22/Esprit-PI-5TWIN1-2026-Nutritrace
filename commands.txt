@@ -1,0 +1,25 @@
+composer install
+
+php artisan serve
+
+
+php artisan migrate
+php artisan make:migration
+
+php artisan optimize:clear
+
+php artisan route:list
+
+
+
+
+#DATABASE
+
+mysql -u root -p
+
+#DATABASE SEEDER 
+
+php artisan db:seed --class=YourSeederName 
+
+php artisan db:seed --class=RoleAndPermissionSeeder
+php artisan db:seed --class=UserSeeder

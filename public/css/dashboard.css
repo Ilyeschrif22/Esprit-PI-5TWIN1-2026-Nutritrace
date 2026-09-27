@@ -348,6 +348,11 @@ body{
     color: #66828a;
 }
 
+.profile-dropdown-item a {
+    color: inherit;
+    text-decoration: none;
+}
+
 
 
 .profile-dropdown-item.danger {
@@ -1195,4 +1200,13 @@ body{
     .secondary-grid {
         grid-template-columns: 1fr 1fr;
     }
+<<<<<<< HEAD
+=======
+}
+
+.nutritrace-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 18px;
+>>>>>>> origin/main
 }

@@ -67,12 +67,32 @@
     gap: 14px;
     font-size: 14px;
     transition: background-color 0.25s ease, color 0.25s ease;
+    margin: 0;
+    list-style: none;
+}
+
+.sidebar-list li a {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    color: inherit;
+    text-decoration: none;
+    width: 100%;
+    cursor: pointer;
+}
+
+.sidebar-list li a:hover {
+    color: #fff;
 }
 
 .sidebar-list li.active {
     background-color: #2e7d32;
     color: #fff;
     border-radius: 4px;
+}
+
+.sidebar-list li.active a {
+    color: #fff;
 }
 
 
