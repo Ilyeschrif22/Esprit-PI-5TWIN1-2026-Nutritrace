@@ -174,12 +174,37 @@
         .leaflet-container { font-family: inherit; }
         .leaflet-control-zoom { border: none !important; box-shadow: 0 5px 18px rgba(20,55,47,.12) !important; }
         .leaflet-control-zoom a { color: #315c52 !important; border: none !important; }
-        .trace-popup { min-width: 210px; }
+        .trace-popup { min-width: 220px; }
+        .trace-popup-production { min-width: 240px; }
         .trace-popup-header { padding-bottom: 8px; margin-bottom: 8px; border-bottom: 1px solid #edf2f0; }
-        .trace-popup-header strong { display: block; color: #163e35; font-size: 13px; }
-        .trace-popup-header span { display: block; margin-top: 2px; color: #78908a; font-size: 10px; }
-        .trace-popup-row { display: flex; justify-content: space-between; gap: 15px; padding: 3px 0; color: #526d67; font-size: 10px; }
-        .trace-popup-row strong { color: #234b42; }
+        .trace-popup-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 8px;
+            padding: 4px 7px;
+            border-radius: 999px;
+            background: rgba(23, 107, 82, 0.10);
+            color: #176b52;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: .05em;
+            text-transform: uppercase;
+        }
+        .trace-popup-badge::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+            display: block;
+        }
+        .trace-popup-header strong { display: block; color: #163e35; font-size: 13px; line-height: 1.3; }
+        .trace-popup-header span { display: block; margin-top: 3px; color: #78908a; font-size: 10px; }
+        .trace-popup-body { display: grid; gap: 2px; }
+        .trace-popup-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 4px 0; color: #526d67; font-size: 10px; }
+        .trace-popup-row span { color: #607a74; }
+        .trace-popup-row strong { color: #234b42; font-size: 10px; text-align: right; }
         @media (max-width: 1250px) {
             .trace-kpis { grid-template-columns: repeat(3, 1fr); }
             .trace-main-grid { grid-template-columns: 1fr; }
@@ -209,6 +234,8 @@
     @include('components.sidebar')
     <div class="nutritrace-main-container">
         @include('components.navbar')
+
+        <div class="nutritrace-content">
 
         <div class="traceability-page">
             <header class="trace-header">
@@ -313,11 +340,56 @@
                                 <div class="route-summary-item"><span>Distance</span><strong id="mapDistance">—</strong></div>
                                 <div class="route-summary-item"><span>CO₂</span><strong id="mapCo2">—</strong></div>
                             </div>
-                            <div class="map-action-row"><button type="button" class="trace-action-button" id="mapTransitButton">Marquer en transit</button></div>
+                            <div class="map-action-row">
+                                <button type="button" class="trace-action-button" id="mapProductionButton">Marquer comme production</button>
+                                <button type="button" class="trace-action-button secondary" id="mapDistributionButton">Ajouter une distribution</button>
+                                <button type="button" class="trace-action-button secondary" id="mapTransitButton">Marquer en transit</button>
+                            </div>
+                            <div class="transit-form-panel visible" id="productionFormPanel" style="display:none; margin-top: 12px;">
+                                <div class="transit-form">
+                                    <div class="transit-form-grid">
+                                        <label>Produit<select id="productionProduct"></select></label>
+                                        <label>Lot<select id="productionLot"><option value="">Créer un nouveau lot</option></select></label>
+                                        <label>Type de production<select id="productionType">
+                                            <option value="agricultural">Agricole</option>
+                                            <option value="livestock">Élevage</option>
+                                            <option value="aquaculture">Aquaculture</option>
+                                            <option value="horticultural">Horticulture</option>
+                                            <option value="organic">Bio</option>
+                                            <option value="conventional">Conventionnel</option>
+                                            <option value="mixed">Mixte</option>
+                                            <option value="other">Autre</option>
+                                        </select></label>
+                                        <label>Méthode<select id="productionMethod">
+                                            <option value="organic">Biologique</option>
+                                            <option value="conventional">Conventionnel</option>
+                                            <option value="integrated">Intégré</option>
+                                            <option value="sustainable">Durable</option>
+                                            <option value="controlled_environment">Environnement maîtrisé</option>
+                                            <option value="local_traditional">Traditionnel local</option>
+                                            <option value="other">Autre</option>
+                                        </select></label>
+                                        <label>Quantité<input id="productionQuantity" type="number" step="0.01" min="0.01" value="1" /></label>
+                                        <label>Unité<select id="productionUnit">
+                                            <option value="kg">kg</option>
+                                            <option value="g">g</option>
+                                            <option value="l">L</option>
+                                            <option value="units">unités</option>
+                                            <option value="boxes">boîtes</option>
+                                        </select></label>
+                                        <label>Référence<input id="productionReference" type="text" placeholder="Référence lot" /></label>
+                                        <label>Date de production<input id="productionDate" type="date" /></label>
+                                    </div>
+                                    <div class="transit-form-actions">
+                                        <button type="button" class="trace-action-button secondary" id="cancelProductionBtn">Annuler</button>
+                                        <button type="button" class="trace-action-button primary" id="submitProductionBtn">Enregistrer la production</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="map-legend">
                             <div class="legend-item"><span class="legend-dot" style="background:#176b52;"></span>Production</div>
-                            <div class="legend-item"><span class="legend-dot" style="background:#c88432;"></span>Stockage</div>
+                            <div class="legend-item"><span class="legend-dot" style="background:#c88432;"></span>Transformation / Storage</div>
                             <div class="legend-item"><span class="legend-dot" style="background:#3978a8;"></span>Transport</div>
                             <div class="legend-item"><span class="legend-dot" style="background:#7461a8;"></span>Distribution</div>
                         </div>
@@ -449,13 +521,119 @@
             </section>
         </div>
     </div>
+    </div>
+
+
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const lots = @json($lots ?? []);
+            const products = @json($products ?? []);
+            const productionLots = @json($productionLots ?? []);
             let selectedLot = null;
+            let selectedLocation = null;
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+            const productionProductSelect = document.getElementById('productionProduct');
+            const productionLotSelect = document.getElementById('productionLot');
+            const productionQuantityInput = document.getElementById('productionQuantity');
+            const productionUnitSelect = document.getElementById('productionUnit');
+            const productionTypeSelect = document.getElementById('productionType');
+            const productionMethodSelect = document.getElementById('productionMethod');
+            const productionReferenceInput = document.getElementById('productionReference');
+            const productionDateInput = document.getElementById('productionDate');
+            const productionFormPanel = document.getElementById('productionFormPanel');
+
+            function populateProductionProducts() {
+                productionProductSelect.innerHTML = '<option value="">Sélectionner un produit</option>' + products.map(product => {
+                    const name = product && product.name ? product.name : 'Produit';
+                    return `<option value="${product.id}">${escapeHtml(name)}</option>`;
+                }).join('');
+
+                if (products.length > 0) {
+                    productionProductSelect.value = String(products[0].id);
+                }
+                refreshProductionLots();
+            }
+
+            function refreshProductionLots() {
+                const productId = productionProductSelect.value;
+                const productLots = productionLots.filter(lot => String(lot.product_id) === String(productId));
+
+                productionLotSelect.innerHTML = '<option value="">Créer un nouveau lot</option>' + productLots.map(lot => {
+                    const lotNumber = lot.lot_number || `Lot ${lot.id}`;
+                    const quantity = lot.quantity ? `${lot.quantity} ${lot.unit || ''}`.trim() : '—';
+                    return `<option value="${lot.id}">${escapeHtml(lotNumber)} • ${escapeHtml(quantity)}</option>`;
+                }).join('');
+            }
+
+            function openProductionForm() {
+                if (!selectedLocation) {
+                    alert('Sélectionnez d\'abord un point sur la carte pour enregistrer une production.');
+                    return;
+                }
+                const date = new Date();
+                productionDateInput.value = date.toISOString().slice(0, 10);
+                productionFormPanel.style.display = 'block';
+            }
+
+            function closeProductionForm() {
+                productionFormPanel.style.display = 'none';
+            }
+
+            function buildProductionPayload() {
+                const selectedProductId = productionProductSelect.value;
+                const selectedLotId = productionLotSelect.value;
+                const product = products.find(item => String(item.id) === String(selectedProductId));
+                const payload = {
+                    action: 'production',
+                    latitude: Number(selectedLocation.lat),
+                    longitude: Number(selectedLocation.lng),
+                    product_id: selectedProductId || null,
+                    lot_id: selectedLotId || null,
+                    product_name: product?.name || 'Produit local',
+                    lot_number: productionReferenceInput.value.trim() || null,
+                    quantity: Number(productionQuantityInput.value || 1),
+                    unit: productionUnitSelect.value || 'kg',
+                    category: product?.category || 'Divers',
+                    production_type: productionTypeSelect.value || 'agricultural',
+                    production_method: productionMethodSelect.value || 'organic',
+                    production_reference: productionReferenceInput.value.trim() || null,
+                    produced_at: productionDateInput.value || new Date().toISOString().slice(0, 10),
+                    origin: 'Site de production sélectionné',
+                    location: 'Site de production sélectionné',
+                    notes: `Production enregistrée au point ${selectedLocation.lat.toFixed(5)}, ${selectedLocation.lng.toFixed(5)}`
+                };
+                return payload;
+            }
+
+            async function submitProductionFromMap() {
+                if (!selectedLocation) {
+                    alert('Sélectionnez un point sur la carte avant d\'enregistrer la production.');
+                    return;
+                }
+
+                const payload = buildProductionPayload();
+                try {
+                    const response = await fetch('/traceability/location-event', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrfToken, 'X-Requested-With': 'XMLHttpRequest' },
+                        body: JSON.stringify(payload)
+                    });
+                    const result = await response.json();
+                    if (!response.ok || result.success === false) {
+                        throw new Error(result.message || 'Impossible d\'enregistrer la production.');
+                    }
+                    closeProductionForm();
+                    alert(result.message || 'Production enregistrée.');
+                    window.location.reload();
+                } catch (error) {
+                    alert(error.message || 'Une erreur est survenue.');
+                }
+            }
+
+            populateProductionProducts();
+            productionProductSelect.addEventListener('change', refreshProductionLots);
 
             function getStatusClass(status) {
                 const normalized = String(status || 'active').toLowerCase();
@@ -472,13 +650,13 @@
             map.setView([34.8, 9.5], 6);
 
             const stageConfig = {
-                production: { label: 'Production', color: '#176b52' },
-                transformation: { label: 'Transformation', color: '#7461a8' },
-                stockage: { label: 'Stockage', color: '#c88432' },
-                storage: { label: 'Stockage', color: '#c88432' },
-                transport: { label: 'Transport', color: '#3978a8' },
-                distribution: { label: 'Distribution', color: '#7461a8' },
-                default: { label: 'Étape', color: '#176b52' }
+                production: { label: 'Production', status: 'Lot origin', color: '#176b52' },
+                transformation: { label: 'Transformation / Storage', status: 'Processing & storage event', color: '#c88432' },
+                stockage: { label: 'Transformation / Storage', status: 'Processing & storage event', color: '#c88432' },
+                storage: { label: 'Transformation / Storage', status: 'Processing & storage event', color: '#c88432' },
+                transport: { label: 'Transport', status: 'In Transit', color: '#3978a8' },
+                distribution: { label: 'Distribution', status: 'Distribution stage', color: '#7461a8' },
+                default: { label: 'Traceability stage', status: 'Lot event', color: '#176b52' }
             };
 
             function normalizeStage(stage) {
@@ -491,10 +669,67 @@
                 return stageConfig[normalized] || stageConfig.default;
             }
 
+            function formatPopupDate(value) {
+                if (!value) return '—';
+                const date = new Date(value);
+                if (Number.isNaN(date.getTime())) return String(value);
+                return new Intl.DateTimeFormat('fr-FR', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                }).format(date);
+            }
+
+            function buildPopupContent(lot, config, index) {
+                const stageKey = normalizeStage(lot.stage || lot.type);
+                const productionRef = lot.production_reference || lot.reference || lot.lot_number || `Production ${String(index + 1).padStart(3, '0')}`;
+                const quantity = [lot.quantity, lot.unit].filter(Boolean).join(' ') || '—';
+                const location = lot.location || lot.origin || lot.city || '—';
+                const producer = lot.actor || lot.producer || lot.origin || '—';
+                const lastUpdate = lot.updated_at || lot.occurred_at || lot.produced_at || '—';
+
+                if (stageKey === 'production') {
+                    return `
+                        <div class="trace-popup trace-popup-production">
+                            <div class="trace-popup-header">
+                                <div class="trace-popup-badge">Production</div>
+                                <strong>${escapeHtml(productionRef)}</strong>
+                                <span>${escapeHtml(lot.product_name || 'Produit')}</span>
+                            </div>
+                            <div class="trace-popup-body">
+                                <div class="trace-popup-row"><span>Producteur</span><strong>${escapeHtml(producer)}</strong></div>
+                                <div class="trace-popup-row"><span>Date</span><strong>${escapeHtml(formatPopupDate(lot.produced_at || lot.occurred_at))}</strong></div>
+                                <div class="trace-popup-row"><span>Quantité</span><strong>${escapeHtml(quantity)}</strong></div>
+                                <div class="trace-popup-row"><span>Localisation</span><strong>${escapeHtml(location)}</strong></div>
+                                <div class="trace-popup-row"><span>Statut</span><strong>${escapeHtml(config.status)}</strong></div>
+                                <div class="trace-popup-row"><span>Mise à jour</span><strong>${escapeHtml(formatPopupDate(lastUpdate))}</strong></div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div class="trace-popup">
+                        <div class="trace-popup-header">
+                            <strong>${escapeHtml(lot.lot_number || 'Lot')}</strong>
+                            <span>${escapeHtml(lot.product_name || 'Produit')}</span>
+                        </div>
+                        <div class="trace-popup-body">
+                            <div class="trace-popup-row"><span>Étape</span><strong>${escapeHtml(config.label)}</strong></div>
+                            <div class="trace-popup-row"><span>Statut</span><strong>${escapeHtml(config.status)}</strong></div>
+                            <div class="trace-popup-row"><span>Origine</span><strong>${escapeHtml(lot.origin || lot.city || '—')}</strong></div>
+                            <div class="trace-popup-row"><span>Acteur</span><strong>${escapeHtml(lot.actor || '—')}</strong></div>
+                            <div class="trace-popup-row"><span>Date</span><strong>${escapeHtml(lot.occurred_at || '—')}</strong></div>
+                        </div>
+                    </div>
+                `;
+            }
+
             const markerLayer = L.layerGroup().addTo(map);
             const markers = [];
             const routePoints = [];
             const routeMeta = { color: '#176b52', isRouteReady: false };
+            const seenProductionMarkers = new Map();
 
             const orderedLots = [...lots];
             if (orderedLots.some(item => item.sequence !== undefined || item.occurred_at !== undefined)) {
@@ -507,6 +742,74 @@
             }
 
             orderedLots.forEach(function (lot, index) {
+                const productionLocation = lot.production_location || { name: lot.origin || 'Production', lat: lot.lat, lng: lot.lng };
+                const hasValidProduction = productionLocation && Number.isFinite(Number(productionLocation.lat)) && Number.isFinite(Number(productionLocation.lng));
+                const producerKey = (lot.producer || productionLocation.name || lot.origin || lot.lot_number || '').toString().trim().toLowerCase();
+
+                if (hasValidProduction && !seenProductionMarkers.has(producerKey)) {
+                    const productionMarker = L.marker([Number(productionLocation.lat), Number(productionLocation.lng)], {
+                        icon: L.divIcon({
+                            className: 'nt-marker-wrapper',
+                            html: '<div class="nt-map-marker" style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#176b52,#1d9a69);border:3px solid #ffffff;box-shadow:0 5px 14px rgba(23,107,82,.22);display:flex;align-items:center;justify-content:center;color:#ffffff;font-size:11px;font-weight:800;letter-spacing:.02em;">P</div>',
+                            iconSize: [34, 34],
+                            iconAnchor: [17, 17],
+                            popupAnchor: [0, -17]
+                        })
+                    });
+                    productionMarker.bindPopup(`
+                        <div class="trace-popup trace-popup-production">
+                            <div class="trace-popup-header">
+                                <div class="trace-popup-badge">Production</div>
+                                <strong>${escapeHtml(lot.product_name || productionLocation.name || 'Production')}</strong>
+                                <span>${escapeHtml(productionLocation.name || lot.origin || 'Site de production')}</span>
+                            </div>
+                            <div class="trace-popup-body">
+                                <div class="trace-popup-row"><span>Producteur</span><strong>${escapeHtml(lot.producer || '—')}</strong></div>
+                                <div class="trace-popup-row"><span>Lot</span><strong>${escapeHtml(lot.lot_number || '—')}</strong></div>
+                                <div class="trace-popup-row"><span>Statut</span><strong>${escapeHtml(lot.status || 'active')}</strong></div>
+                            </div>
+                        </div>
+                    `, { maxWidth: 260 });
+                    productionMarker.addTo(markerLayer);
+                    seenProductionMarkers.set(producerKey, productionMarker);
+                }
+
+                const route = lot.route || null;
+                if (route && Array.isArray(route.origin) && Array.isArray(route.destination)) {
+                    const routeOrigin = route.origin.map(Number);
+                    const routeDestination = route.destination.map(Number);
+                    if (!routeOrigin.some(Number.isNaN) && !routeDestination.some(Number.isNaN)) {
+                        routePoints.push(routeOrigin, routeDestination);
+                        routeMeta.isRouteReady = true;
+                        routeMeta.color = '#3978a8';
+                        const routeLine = L.polyline([routeOrigin, routeDestination], { color: '#3978a8', weight: 4, opacity: 0.85, lineJoin: 'round', lineCap: 'round' }).addTo(map);
+                        const destinationMarker = L.marker(routeDestination, {
+                            icon: L.divIcon({
+                                className: 'nt-marker-wrapper',
+                                html: '<div class="nt-map-marker" style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#7461a8,#a67dc5);border:3px solid #ffffff;box-shadow:0 5px 14px rgba(116,97,168,.24);display:flex;align-items:center;justify-content:center;color:#ffffff;font-size:9px;font-weight:800;">D</div>',
+                                iconSize: [28, 28],
+                                iconAnchor: [14, 14],
+                                popupAnchor: [0, -14]
+                            })
+                        });
+                        destinationMarker.bindPopup(`
+                            <div class="trace-popup">
+                                <div class="trace-popup-header">
+                                    <div class="trace-popup-badge">Destination</div>
+                                    <strong>${escapeHtml(lot.lot_number || 'Lot')}</strong>
+                                    <span>${escapeHtml(lot.product_name || 'Produit')}</span>
+                                </div>
+                                <div class="trace-popup-body">
+                                    <div class="trace-popup-row"><span>Origine</span><strong>${escapeHtml(lot.origin || '—')}</strong></div>
+                                    <div class="trace-popup-row"><span>Destination</span><strong>${escapeHtml(lot.destination || '—')}</strong></div>
+                                    <div class="trace-popup-row"><span>Statut</span><strong>${escapeHtml(String(lot.status || 'active'))}</strong></div>
+                                </div>
+                            </div>
+                        `, { maxWidth: 260 });
+                        destinationMarker.addTo(markerLayer);
+                    }
+                }
+
                 if (lot.lat === undefined || lot.lng === undefined || lot.lat === null || lot.lng === null) return;
                 const lat = Number(lot.lat);
                 const lng = Number(lot.lng);
@@ -514,6 +817,9 @@
                 const stage = normalizeStage(lot.stage || lot.type);
                 const config = getStageConfig(stage);
                 const status = String(lot.status || '').toLowerCase();
+                if (stage === 'production' && seenProductionMarkers.has(producerKey)) {
+                    return;
+                }
                 const isRouteLot = status === 'in_transit' || stage === 'transport' || stage === 'distribution';
                 if (isRouteLot) {
                     routePoints.push([lat, lng]);
@@ -521,10 +827,11 @@
                     routeMeta.color = stage === 'distribution' ? '#7461a8' : '#3978a8';
                 }
 
-                const markerHtml = '<div class="nt-map-marker" style="width:32px;height:32px;border-radius:50%;background:' + config.color + ';border:3px solid #ffffff;box-shadow:0 3px 12px rgba(20,55,47,.24);display:flex;align-items:center;justify-content:center;color:#ffffff;font-size:10px;font-weight:800;">' + (index + 1) + '</div>';
-                const marker = L.marker([lat, lng], { icon: L.divIcon({ className: 'nt-marker-wrapper', html: markerHtml, iconSize: [32, 32], iconAnchor: [16, 16], popupAnchor: [0, -17] }) });
-                const popup = '<div class="trace-popup"><div class="trace-popup-header"><strong>' + escapeHtml(lot.lot_number || 'Lot') + '</strong><span>' + escapeHtml(lot.product_name || 'Produit') + '</span></div><div class="trace-popup-row"><span>Étape</span><strong>' + escapeHtml(config.label) + '</strong></div><div class="trace-popup-row"><span>Origine</span><strong>' + escapeHtml(lot.origin || lot.city || '—') + '</strong></div><div class="trace-popup-row"><span>Acteur</span><strong>' + escapeHtml(lot.actor || '—') + '</strong></div><div class="trace-popup-row"><span>Date</span><strong>' + escapeHtml(lot.occurred_at || '—') + '</strong></div></div>';
-                marker.bindPopup(popup, { maxWidth: 280 });
+                const isProductionMarker = stage === 'production';
+                const markerHtml = '<div class="nt-map-marker" style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,' + config.color + ', #1d9a69);border:3px solid #ffffff;box-shadow:0 5px 14px rgba(23,107,82,.22);display:flex;align-items:center;justify-content:center;color:#ffffff;font-size:11px;font-weight:800;letter-spacing:.02em;">' + (isProductionMarker ? 'P' : (index + 1)) + '</div>';
+                const marker = L.marker([lat, lng], { icon: L.divIcon({ className: 'nt-marker-wrapper', html: markerHtml, iconSize: [34, 34], iconAnchor: [17, 17], popupAnchor: [0, -17] }) });
+                const popup = buildPopupContent(lot, config, index);
+                marker.bindPopup(popup, { maxWidth: 300 });
                 marker.__stage = stage;
                 marker.__lot = lot;
                 marker.on('click', function () { updateSelectedLot(lot, index); });
@@ -588,6 +895,14 @@
 
             if (orderedLots.length > 0) updateSelectedLot(orderedLots[0], 0);
 
+            map.on('click', function (event) {
+                selectedLocation = {
+                    lat: event.latlng.lat,
+                    lng: event.latlng.lng,
+                };
+                document.getElementById('mapSelectedLot').textContent = 'Point sélectionné';
+            });
+
             function openTransitForm() {
                 if (!selectedLot || !selectedLot.id) {
                     alert('Sélectionnez d\'abord un lot pour le mettre en transit.');
@@ -599,6 +914,42 @@
 
             function closeTransitForm() {
                 document.getElementById('transitFormPanel').classList.remove('visible');
+            }
+
+            async function submitLocationEvent(action) {
+                if (!selectedLocation || Number.isNaN(selectedLocation.lat) || Number.isNaN(selectedLocation.lng)) {
+                    alert('Sélectionnez un point sur la carte avant d\'enregistrer un événement.');
+                    return;
+                }
+
+                const payload = {
+                    action,
+                    latitude: selectedLocation.lat,
+                    longitude: selectedLocation.lng,
+                    lot_id: selectedLot && selectedLot.id ? selectedLot.id : null,
+                    product_name: selectedLot && selectedLot.product_name ? selectedLot.product_name : 'Produit local',
+                    quantity: selectedLot && selectedLot.quantity ? selectedLot.quantity : 1,
+                    unit: selectedLot && selectedLot.unit ? selectedLot.unit : 'kg',
+                    origin: selectedLot && selectedLot.origin ? selectedLot.origin : 'Localisation sélectionnée',
+                    location: selectedLot && selectedLot.origin ? selectedLot.origin : 'Localisation sélectionnée',
+                    destination: selectedLot && selectedLot.origin ? selectedLot.origin : 'Localisation sélectionnée',
+                };
+
+                try {
+                    const response = await fetch('/traceability/location-event', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrfToken, 'X-Requested-With': 'XMLHttpRequest' },
+                        body: JSON.stringify(payload)
+                    });
+                    const result = await response.json();
+                    if (!response.ok || result.success === false) {
+                        throw new Error(result.message || 'Impossible d\'enregistrer l\'événement de traçabilité.');
+                    }
+                    alert(result.message || 'Événement enregistré.');
+                    window.location.reload();
+                } catch (error) {
+                    alert(error.message || 'Une erreur est survenue.');
+                }
             }
 
             async function submitTransit() {
@@ -625,6 +976,10 @@
                 }
             }
 
+            document.getElementById('mapProductionButton').addEventListener('click', openProductionForm);
+            document.getElementById('submitProductionBtn').addEventListener('click', submitProductionFromMap);
+            document.getElementById('cancelProductionBtn').addEventListener('click', closeProductionForm);
+            document.getElementById('mapDistributionButton').addEventListener('click', function () { submitLocationEvent('distribution'); });
             document.getElementById('openTransitFormBtn').addEventListener('click', openTransitForm);
             document.getElementById('mapTransitButton').addEventListener('click', openTransitForm);
             document.getElementById('cancelTransitBtn').addEventListener('click', closeTransitForm);

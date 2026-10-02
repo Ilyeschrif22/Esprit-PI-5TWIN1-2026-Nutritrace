@@ -84,4 +84,50 @@ class TraceabilityFlowTest extends TestCase
             'event_type' => 'IN_TRANSIT',
         ]);
     }
+
+    public function test_a_location_selection_can_create_a_production_or_distribution_event(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->postJson(route('traceability.location-event.store'), [
+                'action' => 'production',
+                'latitude' => 36.8065,
+                'longitude' => 10.1815,
+                'product_name' => 'Olives de Tunis',
+                'quantity' => 80,
+                'unit' => 'kg',
+                'origin' => 'Tunis',
+            ])
+            ->assertOk()
+            ->assertJsonPath('success', true);
+
+        $this->assertDatabaseHas('trace_events', [
+            'stage' => TraceStage::PRODUCTION->value,
+            'event_type' => 'PRODUCTION',
+            'latitude' => 36.8065,
+            'longitude' => 10.1815,
+        ]);
+
+        $lot = Lot::query()->latest()->first();
+
+        $this->actingAs($user)
+            ->postJson(route('traceability.location-event.store'), [
+                'action' => 'distribution',
+                'latitude' => 35.8254,
+                'longitude' => 10.6367,
+                'lot_id' => $lot?->id,
+                'destination' => 'Sousse',
+            ])
+            ->assertOk()
+            ->assertJsonPath('success', true);
+
+        $this->assertDatabaseHas('trace_events', [
+            'lot_id' => $lot?->id,
+            'stage' => TraceStage::DISTRIBUTION->value,
+            'event_type' => 'DISTRIBUTION',
+            'latitude' => 35.8254,
+            'longitude' => 10.6367,
+        ]);
+    }
 }

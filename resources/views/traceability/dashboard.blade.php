@@ -1609,7 +1609,13 @@
                     </div>
 
                     <div class="map-action-row">
-                        <button type="button" class="trace-action-button" id="mapTransitButton">
+                        <button type="button" class="trace-action-button" id="mapProductionButton">
+                            Marquer comme production
+                        </button>
+                        <button type="button" class="trace-action-button secondary" id="mapDistributionButton">
+                            Ajouter une distribution
+                        </button>
+                        <button type="button" class="trace-action-button secondary" id="mapTransitButton">
                             Marquer en transit
                         </button>
                     </div>
@@ -2395,6 +2401,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const lots = @json($lots ?? []);
     let selectedLot = null;
+    let selectedLocation = null;
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 
     function getStatusClass(status) {
@@ -2447,36 +2454,43 @@ document.addEventListener('DOMContentLoaded', function () {
 
         production: {
             label: 'Production',
+            status: 'Lot origin',
             color: '#176b52'
         },
 
         transformation: {
-            label: 'Transformation',
-            color: '#7461a8'
+            label: 'Transformation / Storage',
+            status: 'Processing & storage event',
+            color: '#c88432'
         },
 
         stockage: {
-            label: 'Stockage',
+            label: 'Transformation / Storage',
+            status: 'Processing & storage event',
             color: '#c88432'
         },
 
         storage: {
-            label: 'Stockage',
+            label: 'Transformation / Storage',
+            status: 'Processing & storage event',
             color: '#c88432'
         },
 
         transport: {
             label: 'Transport',
+            status: 'In Transit',
             color: '#3978a8'
         },
 
         distribution: {
             label: 'Distribution',
+            status: 'Distribution stage',
             color: '#7461a8'
         },
 
         default: {
-            label: 'Étape',
+            label: 'Traceability stage',
+            status: 'Lot event',
             color: '#176b52'
         }
 
@@ -2660,6 +2674,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     <strong>
                         ${escapeHtml(config.label)}
+                    </strong>
+
+                </div>
+
+                <div class="trace-popup-row">
+
+                    <span>Statut</span>
+
+                    <strong>
+                        ${escapeHtml(config.status)}
                     </strong>
 
                 </div>
@@ -2942,6 +2966,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
     }
 
+    map.on('click', function (event) {
+        selectedLocation = {
+            lat: event.latlng.lat,
+            lng: event.latlng.lng,
+        };
+
+        document.getElementById('mapSelectedLot').textContent = 'Point sélectionné';
+    });
+
     function openTransitForm() {
         if (!selectedLot || !selectedLot.id) {
             alert('Sélectionnez d\'abord un lot pour le mettre en transit.');
@@ -2954,6 +2987,50 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function closeTransitForm() {
         document.getElementById('transitFormPanel').classList.remove('visible');
+    }
+
+    async function submitLocationEvent(action) {
+        if (!selectedLocation || Number.isNaN(selectedLocation.lat) || Number.isNaN(selectedLocation.lng)) {
+            alert('Sélectionnez un point sur la carte avant d\'enregistrer un événement.');
+            return;
+        }
+
+        const payload = {
+            action,
+            latitude: selectedLocation.lat,
+            longitude: selectedLocation.lng,
+            lot_id: selectedLot && selectedLot.id ? selectedLot.id : null,
+            product_name: selectedLot && selectedLot.product_name ? selectedLot.product_name : 'Produit local',
+            quantity: selectedLot && selectedLot.quantity ? selectedLot.quantity : 1,
+            unit: selectedLot && selectedLot.unit ? selectedLot.unit : 'kg',
+            origin: selectedLot && selectedLot.origin ? selectedLot.origin : 'Localisation sélectionnée',
+            location: selectedLot && selectedLot.origin ? selectedLot.origin : 'Localisation sélectionnée',
+            destination: selectedLot && selectedLot.origin ? selectedLot.origin : 'Localisation sélectionnée',
+        };
+
+        try {
+            const response = await fetch('/traceability/location-event', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await response.json();
+
+            if (!response.ok || result.success === false) {
+                throw new Error(result.message || 'Impossible d\'enregistrer l\'événement de traçabilité.');
+            }
+
+            alert(result.message || 'Événement enregistré.');
+            window.location.reload();
+        } catch (error) {
+            alert(error.message || 'Une erreur est survenue.');
+        }
     }
 
     async function submitTransit() {
@@ -2998,6 +3075,8 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    document.getElementById('mapProductionButton').addEventListener('click', function () { submitLocationEvent('production'); });
+    document.getElementById('mapDistributionButton').addEventListener('click', function () { submitLocationEvent('distribution'); });
     document.getElementById('openTransitFormBtn').addEventListener('click', openTransitForm);
     document.getElementById('mapTransitButton').addEventListener('click', openTransitForm);
     document.getElementById('cancelTransitBtn').addEventListener('click', closeTransitForm);

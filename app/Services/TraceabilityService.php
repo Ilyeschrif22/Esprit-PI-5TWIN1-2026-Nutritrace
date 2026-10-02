@@ -6,51 +6,183 @@ use App\Enums\LotStatus;
 use App\Enums\TraceEventStatus;
 use App\Enums\TraceStage;
 use App\Events\TraceEventCreated;
+use App\Models\Location;
 use App\Models\Lot;
 use App\Models\Product;
+use App\Models\Shipment;
 use App\Models\TraceAlert;
 use App\Models\TraceEvent;
 use App\Models\User;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class TraceabilityService
 {
+    public function ensureProductionLocation(User $user, array $data): Location
+    {
+        return DB::transaction(function () use ($user, $data) {
+            $payload = [
+                'user_id' => $user->id,
+                'type' => strtoupper($data['type'] ?? 'PRODUCTION_SITE'),
+                'production_type' => $data['production_type'] ?? null,
+                'production_method' => $data['production_method'] ?? null,
+                'production_reference' => $data['production_reference'] ?? null,
+                'name' => $data['name'] ?? $data['origin'] ?? $data['city'] ?? $user->fullname.' - Site de production',
+                'address' => $data['address'] ?? $data['location'] ?? null,
+                'city' => $data['city'] ?? $data['origin'] ?? null,
+                'governorate' => $data['governorate'] ?? $data['origin'] ?? null,
+                'latitude' => $data['latitude'] ?? null,
+                'longitude' => $data['longitude'] ?? null,
+                'metadata' => array_merge([
+                    'production_type' => $data['production_type'] ?? null,
+                    'production_method' => $data['production_method'] ?? null,
+                    'production_reference' => $data['production_reference'] ?? null,
+                ], (array) ($data['metadata'] ?? [])),
+            ];
+
+            $latitude = isset($payload['latitude']) && $payload['latitude'] !== null ? (float) $payload['latitude'] : null;
+            $longitude = isset($payload['longitude']) && $payload['longitude'] !== null ? (float) $payload['longitude'] : null;
+
+            if (($latitude === null || $longitude === null) && !empty($payload['city'])) {
+                [$latitude, $longitude] = $this->resolveCoordinates((string) $payload['city']);
+            }
+
+            $payload['latitude'] = $latitude;
+            $payload['longitude'] = $longitude;
+
+            $existing = Location::query()
+                ->where('user_id', $user->id)
+                ->where('type', $payload['type'])
+                ->lockForUpdate()
+                ->first();
+
+            if ($existing) {
+                $existing->fill($payload);
+                $existing->save();
+
+                return $existing->fresh();
+            }
+
+            try {
+                return Location::create($payload);
+            } catch (QueryException $exception) {
+                if (! str_contains($exception->getMessage(), 'locations_user_id_type_unique')) {
+                    throw $exception;
+                }
+
+                $fallback = Location::query()
+                    ->where('user_id', $user->id)
+                    ->where('type', $payload['type'])
+                    ->firstOrFail();
+
+                $fallback->fill($payload);
+                $fallback->save();
+
+                return $fallback->fresh();
+            }
+        });
+    }
+
     public function recordProduction(array $data, User $actor): Lot
     {
         return DB::transaction(function () use ($data, $actor) {
-            $product = Product::firstOrCreate([
-                'sku' => $data['sku'] ?? Str::slug($data['product_name'] ?? 'product'),
-            ], [
-                'name' => $data['product_name'] ?? 'Produit',
-                'category' => $data['category'] ?? 'Divers',
-                'unit' => $data['unit'] ?? 'kg',
-                'description' => $data['description'] ?? null,
-                'is_active' => true,
-            ]);
+            $productId = $data['product_id'] ?? null;
+            $product = null;
+
+            if ($productId) {
+                $product = Product::query()->findOrFail($productId);
+            } else {
+                $product = Product::firstOrCreate([
+                    'sku' => $data['sku'] ?? Str::slug($data['product_name'] ?? 'product'),
+                ], [
+                    'name' => $data['product_name'] ?? 'Produit',
+                    'category' => $data['category'] ?? 'Divers',
+                    'unit' => $data['unit'] ?? 'kg',
+                    'description' => $data['description'] ?? null,
+                    'is_active' => true,
+                ]);
+            }
 
             $quantity = (float) ($data['quantity'] ?? 0);
             if ($quantity <= 0) {
                 throw new \InvalidArgumentException('La quantité doit être strictement positive.');
             }
 
-            $origin = $data['origin'] ?? $data['location'] ?? 'N/A';
-            $location = $data['location'] ?? $origin;
-            $coordinates = $this->resolveCoordinates($origin ?? $location);
+            $origin = $data['origin'] ?? $data['location'] ?? $data['city'] ?? $product->name ?? 'N/A';
+            $locationLabel = $data['location'] ?? $origin;
+            $coordinates = $this->resolveCoordinates((string) ($origin ?? $locationLabel));
 
-            $lot = Lot::create([
-                'product_id' => $product->id,
-                'lot_number' => $data['lot_number'] ?? 'LOT-'.strtoupper(Str::random(8)),
-                'status' => LotStatus::ACTIVE,
-                'quantity' => $quantity,
-                'unit' => $data['unit'] ?? 'kg',
-                'origin' => $origin,
-                'location' => $location,
-                'produced_at' => $data['produced_at'] ?? now(),
-                'public_token' => $data['public_token'] ?? (string) Str::ulid(),
+            if (isset($data['latitude'], $data['longitude'])) {
+                $coordinates = [(float) $data['latitude'], (float) $data['longitude']];
+            }
+
+            $productionLocation = $this->ensureProductionLocation($actor, [
+                'type' => 'PRODUCTION_SITE',
+                'name' => $data['production_name'] ?? $data['origin'] ?? $data['location'] ?? $actor->fullname.' - Site de production',
+                'address' => $data['address'] ?? $data['location'] ?? $origin,
+                'city' => $data['city'] ?? $data['origin'] ?? $origin,
+                'governorate' => $data['governorate'] ?? $data['origin'] ?? $origin,
+                'production_type' => $data['production_type'] ?? null,
+                'production_method' => $data['production_method'] ?? null,
+                'production_reference' => $data['production_reference'] ?? null,
+                'latitude' => $coordinates[0],
+                'longitude' => $coordinates[1],
                 'metadata' => array_merge([
-                    'coordinates' => $coordinates,
+                    'source' => 'production',
+                    'origin_name' => $origin,
+                    'production_type' => $data['production_type'] ?? null,
+                    'production_method' => $data['production_method'] ?? null,
+                    'production_reference' => $data['production_reference'] ?? null,
                 ], (array) ($data['metadata'] ?? [])),
+            ]);
+
+            $lotId = $data['lot_id'] ?? null;
+            $lot = $lotId ? Lot::query()->findOrFail($lotId) : null;
+
+            if ($lot && $lot->product_id !== $product->id) {
+                throw new \InvalidArgumentException('Le lot sélectionné ne correspond pas au produit sélectionné.');
+            }
+
+            if (! $lot) {
+                $lot = Lot::firstOrCreate(
+                    [
+                        'lot_number' => $data['lot_number'] ?? $data['reference'] ?? 'LOT-'.strtoupper(Str::random(8)),
+                    ],
+                    [
+                        'product_id' => $product->id,
+                        'status' => LotStatus::ACTIVE,
+                        'quantity' => $quantity,
+                        'unit' => $data['unit'] ?? 'kg',
+                        'origin' => $productionLocation->name,
+                        'location' => $productionLocation->name,
+                        'produced_at' => $data['produced_at'] ?? now(),
+                        'public_token' => $data['public_token'] ?? (string) Str::ulid(),
+                        'metadata' => [
+                            'coordinates' => $coordinates,
+                            'production_location_id' => $productionLocation->id,
+                            'producer_id' => $actor->id,
+                            'production_type' => $data['production_type'] ?? null,
+                            'production_method' => $data['production_method'] ?? null,
+                        ],
+                    ]
+                );
+            }
+
+            $lot->update([
+                'product_id' => $product->id,
+                'quantity' => $quantity,
+                'unit' => $data['unit'] ?? $lot->unit ?? 'kg',
+                'origin' => $productionLocation->name,
+                'location' => $productionLocation->name,
+                'produced_at' => $data['produced_at'] ?? $lot->produced_at ?? now(),
+                'metadata' => array_merge((array) ($lot->metadata ?? []), [
+                    'coordinates' => $coordinates,
+                    'production_location_id' => $productionLocation->id,
+                    'producer_id' => $actor->id,
+                    'production_type' => $data['production_type'] ?? data_get($lot->metadata, 'production_type'),
+                    'production_method' => $data['production_method'] ?? data_get($lot->metadata, 'production_method'),
+                ]),
             ]);
 
             $event = TraceEvent::create([
@@ -68,6 +200,10 @@ class TraceabilityService
                     'origin' => $lot->origin,
                     'location' => $lot->location,
                     'coordinates' => $coordinates,
+                    'production_location_id' => $productionLocation->id,
+                    'production_type' => $data['production_type'] ?? null,
+                    'production_method' => $data['production_method'] ?? null,
+                    'production_reference' => $data['production_reference'] ?? null,
                 ],
             ]);
 
@@ -81,7 +217,36 @@ class TraceabilityService
     {
         return DB::transaction(function () use ($lot, $data, $actor) {
             $destination = $data['destination'] ?? $data['location'] ?? $lot->location ?? 'N/A';
-            $coordinates = $this->resolveCoordinates($destination);
+            $coordinates = $this->resolveCoordinates((string) $destination);
+
+            if (isset($data['destination_latitude'], $data['destination_longitude'])) {
+                $coordinates = [(float) $data['destination_latitude'], (float) $data['destination_longitude']];
+            }
+
+            $originLocation = $this->resolveLotProductionLocation($lot);
+            $destinationLocation = $this->ensureLocationForShipment($destination, $coordinates, $data);
+
+            $shipmentReference = $data['reference'] ?? 'SHIP-'.strtoupper(Str::slug($lot->lot_number.'-'.($data['carrier'] ?? 'route')));
+            $shipment = Shipment::query()->firstOrCreate(
+                ['reference' => $shipmentReference],
+                [
+                    'lot_id' => $lot->id,
+                    'reference' => $shipmentReference,
+                    'origin_location_id' => $originLocation?->id ?? $destinationLocation?->id,
+                    'destination_location_id' => $destinationLocation?->id,
+                    'transport_mode' => $data['transport_mode'] ?? 'road',
+                    'carrier' => $data['carrier'] ?? null,
+                    'vehicle_reference' => $data['vehicle_reference'] ?? null,
+                    'status' => 'in_transit',
+                    'distance_km' => $data['distance_km'] ?? 0,
+                    'departed_at' => $data['departed_at'] ?? now(),
+                    'expected_arrival_at' => $data['expected_arrival_at'] ?? now()->addDays(2),
+                    'metadata' => [
+                        'origin' => $lot->origin,
+                        'destination' => $destination,
+                    ],
+                ]
+            );
 
             $lot->update([
                 'status' => LotStatus::IN_TRANSIT,
@@ -93,6 +258,9 @@ class TraceabilityService
                         'carrier' => $data['carrier'] ?? null,
                         'coordinates' => $coordinates,
                     ],
+                    'shipment_id' => $shipment->id,
+                    'destination_location_id' => $destinationLocation?->id,
+                    'production_location_id' => $originLocation?->id,
                 ]),
             ]);
 
@@ -113,6 +281,7 @@ class TraceabilityService
                     'transport_mode' => $data['transport_mode'] ?? null,
                     'carrier' => $data['carrier'] ?? null,
                     'coordinates' => $coordinates,
+                    'shipment_id' => $shipment->id,
                 ],
             ]);
 
@@ -120,6 +289,62 @@ class TraceabilityService
 
             return $lot->fresh();
         });
+    }
+
+    protected function ensureLocationForShipment(string $destination, array $coordinates, array $data = []): ?Location
+    {
+        if (blank($destination)) {
+            return null;
+        }
+
+        $locationName = trim($destination);
+        $type = strtoupper($data['location_type'] ?? 'DISTRIBUTION_CENTER');
+
+        $location = Location::query()->where('name', $locationName)->where('type', $type)->first();
+
+        if ($location) {
+            if ($location->latitude === null || $location->longitude === null) {
+                $location->update([
+                    'latitude' => $coordinates[0],
+                    'longitude' => $coordinates[1],
+                ]);
+            }
+
+            return $location;
+        }
+
+        return Location::create([
+            'name' => $locationName,
+            'type' => $type,
+            'city' => $data['city'] ?? $locationName,
+            'governorate' => $data['governorate'] ?? $locationName,
+            'address' => $data['address'] ?? $locationName,
+            'latitude' => $coordinates[0],
+            'longitude' => $coordinates[1],
+            'metadata' => [
+                'shipment_destination' => true,
+            ],
+        ]);
+    }
+
+    protected function resolveLotProductionLocation(Lot $lot): ?Location
+    {
+        $locationId = data_get($lot->metadata, 'production_location_id');
+
+        if ($locationId) {
+            return Location::query()->find($locationId);
+        }
+
+        $productionName = $lot->origin ?: $lot->location;
+
+        if (blank($productionName)) {
+            return null;
+        }
+
+        return Location::query()
+            ->where('name', 'like', '%'.trim($productionName).'%')
+            ->where('type', 'PRODUCTION_SITE')
+            ->first();
     }
 
     protected function resolveCoordinates(?string $location): array

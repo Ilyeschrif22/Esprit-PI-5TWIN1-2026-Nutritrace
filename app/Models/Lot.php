@@ -48,4 +48,9 @@ class Lot extends Model
     {
         return $this->hasMany(AuditLog::class, 'entity_id')->where('entity_type', self::class);
     }
+
+    public function shipments(): HasMany
+    {
+        return $this->hasMany(Shipment::class);
+    }
 }

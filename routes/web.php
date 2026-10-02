@@ -55,6 +55,7 @@ Route::middleware('auth')->group(function () {
     Route::get('traceability/lots/{lot}/downstream', [TraceabilityController::class, 'downstream'])->name('traceability.downstream');
     Route::get('traceability/lots/{lot}/alerts', [TraceabilityController::class, 'alerts'])->name('traceability.alerts');
     Route::post('traceability/production', [TraceabilityController::class, 'storeProduction'])->name('traceability.production.store');
+    Route::post('traceability/location-event', [TraceabilityController::class, 'storeLocationEvent'])->name('traceability.location-event.store');
     Route::post('traceability/lots/{lot}/transit', [TraceabilityController::class, 'storeTransit'])->name('traceability.lots.transit');
 
     Route::middleware('role.selected')->group(function () {
@@ -69,7 +70,6 @@ Route::middleware('auth')->group(function () {
         Route::get('products', ProductsController::class)->name('products');
         Route::get('batches', BatchesController::class)->name('batches');
         Route::get('utilisateurs', UtilisateursController::class)->name('utilisateurs');
-        Route::get('traceability', TraceabilityController::class)->name('traceability');
         Route::get('transport', TransportController::class)->name('transport');
         Route::get('certifications', CertificationsController::class)->name('certifications');
         Route::get('documents', DocumentsController::class)->name('documents');
